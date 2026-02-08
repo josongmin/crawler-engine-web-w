@@ -1,0 +1,266 @@
+[project]
+name = "wine-crawler"
+version = "0.1.0"
+description = "Playwright-based, extensible web crawler workspace"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "playwright>=1.41",
+  "pydantic>=2.6",
+  "pydantic-settings>=2.2",
+  "typer>=0.12",
+  "rich>=13.7",
+  "tenacity>=8.2",
+  "httpx>=0.27",
+  "playwright-stealth>=2.0",
+  "browserforge[all]>=1.2",
+  "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+admin = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.34",
+  "aiosqlite>=0.21",
+  "cryptography>=44.0",
+  "croniter>=6.0",
+  "python-multipart>=0.0.20",
+  "pyyaml>=6.0",
+  "keyring>=25.0",
+  "eval-type-backport>=0.2.0",
+]
+dev = [
+  # Linting & formatting
+  "ruff>=0.6",
+  # Type checking
+  "pyright>=1.1.390",
+  "mypy>=1.10",
+  # Architecture linting
+  "import-linter>=2.1",
+  # Testing
+  "pytest>=8.2",
+  "pytest-asyncio>=0.23",
+  # Type stubs
+  "types-requests>=2.32.0.20240712",
+  "types-pyyaml>=6.0",
+  # Dev tooling
+  "pre-commit>=3.7",
+]
+
+[project.scripts]
+winecrawl = "wine_crawler.cli:app"
+
+# ── Ruff ──────────────────────────────────────────────────────────────
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+fix = true
+show-fixes = true
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+  # ── Core Python quality ──
+  "E",        # pycodestyle errors
+  "W",        # pycodestyle warnings
+  "F",        # pyflakes
+  "I",        # isort
+  "N",        # pep8-naming
+  "UP",       # pyupgrade (modernise syntax to target-version)
+
+  # ── Bug prevention ──
+  "B",        # flake8-bugbear
+  "S",        # flake8-bandit (security)
+  "PIE",      # misc lints
+  "T20",      # flake8-print (no stray print())
+  "DTZ",      # flake8-datetimez (timezone-aware datetimes)
+  "RSE",      # flake8-raise
+  "RET",      # flake8-return
+
+  # ── Performance & modernisation ──
+  "C4",       # flake8-comprehensions
+  "SIM",      # flake8-simplify
+  "PERF",     # perflint
+  "FURB",     # refurb
+
+  # ── Type-checking hygiene ──
+  "TCH",      # flake8-type-checking (TYPE_CHECKING imports)
+
+  # ── Testing ──
+  "PT",       # flake8-pytest-style
+
+  # ── Code hygiene ──
+  "A",        # flake8-builtins (no shadowing builtins)
+  "ARG",      # flake8-unused-arguments
+  "ERA",      # eradicate (commented-out code)
+  "ICN",      # flake8-import-conventions
+  "FLY",      # flynt (prefer f-strings)
+  "INP",      # flake8-no-pep420 (require __init__.py)
+
+  # ── Pylint subset ──
+  "PLC",      # pylint convention
+  "PLE",      # pylint error
+  "PLR",      # pylint refactor
+  "PLW",      # pylint warning
+
+  # ── Exceptions ──
+  "TRY",      # tryceratops
+
+  # ── Logging ──
+  "LOG",      # flake8-logging
+  "G",        # flake8-logging-format
+
+  # ── Ruff-specific ──
+  "RUF",      # ruff
+]
+
+ignore = [
+  "E501",     # line length — formatter handles this
+  "TRY003",   # long messages in exception constructors (too strict)
+  "PLR0913",  # too many arguments (valid for config-heavy constructors)
+  "PLR2004",  # magic-value comparison (noisy in crawlers/tests)
+  "RET504",   # unnecessary variable before return (readability > brevity)
+  "S101",     # assert — allowed globally, tests get it via per-file-ignores too
+  "ERA001",   # commented-out code — too aggressive on doc comments
+  "S311",     # pseudo-random generators — used for human-simulation, not crypto
+  "PERF203",  # try-except in loop — deliberate resilience pattern in crawlers
+  "S110",     # try-except-pass — acceptable for best-effort cleanup in crawlers
+  "S112",     # try-except-continue — acceptable for crawl-loop resilience
+  "TRY300",   # try-else — too opinionated on control flow
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests: allow assert, fixtures with unused args, magic values, print, hardcoded passwords
+"tests/**/*.py" = ["S101", "ARG", "PLR2004", "T20", "S106", "PLC0415", "PT011", "PT012", "PT018"]
+# CLI: print/console output is expected; late imports for async
+"src/wine_crawler/cli.py" = ["T20", "PLC0415"]
+# __init__.py: unused imports are re-exports
+"**/__init__.py" = ["F401"]
+# DB connection: lazy imports for circular-reference avoidance
+"src/wine_crawler/admin/db/connection.py" = ["PLC0415"]
+# Repositories: SQL queries use string construction for internal schema (not user input);
+# lazy datetime imports in computed fields
+"src/wine_crawler/admin/db/repositories/*.py" = ["S608", "PLC0415"]
+# DB schema: raw SQL migration strings
+"src/wine_crawler/admin/db/schema.py" = ["S608"]
+# Core browser: lazy import to break session↔browser circular dep
+"src/wine_crawler/core/browser.py" = ["PLC0415"]
+# Crawler implementations: complex control flow is inherent;
+# interface methods may leave args unused until implemented
+"src/wine_crawler/sites/*/crawler.py" = ["PLR0911", "PLR0912", "PLR0915", "ARG002"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["wine_crawler"]
+required-imports = ["from __future__ import annotations"]
+
+[tool.ruff.lint.flake8-type-checking]
+runtime-evaluated-base-classes = [
+  "pydantic.BaseModel",
+  "pydantic_settings.BaseSettings",
+]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["typer.Option", "typer.Argument", "pydantic.Field"]
+
+[tool.ruff.lint.pylint]
+max-args = 8
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+# ── Pyright (also configured in pyrightconfig.json for IDE) ───────────
+[tool.pyright]
+pythonVersion = "3.9"
+typeCheckingMode = "standard"
+pythonPlatform = "All"
+include = ["src"]
+exclude = ["**/__pycache__", ".venv", "build", "dist", "admin-ui"]
+
+# ── Mypy (secondary type-checker, kept for CI flexibility) ────────────
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+strict_equality = true
+pretty = true
+mypy_path = ["src"]
+packages = ["wine_crawler"]
+
+# ── Pytest ────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "--strict-markers"
+filterwarnings = [
+  "error",
+  "ignore::DeprecationWarning:playwright.*",
+  "ignore::DeprecationWarning:browserforge.*",
+]
+xfail_strict = true
+
+# ── Import Linter (architecture contracts) ────────────────────────────
+[tool.importlinter]
+root_packages = ["wine_crawler"]
+
+# Foundation modules (config, logging) must not import from any application layer.
+# They are pure infrastructure with zero coupling to business logic.
+[[tool.importlinter.contracts]]
+name = "Foundation modules have no internal dependencies"
+type = "forbidden"
+source_modules = [
+  "wine_crawler.config",
+  "wine_crawler.logging",
+]
+forbidden_modules = [
+  "wine_crawler.core",
+  "wine_crawler.sites",
+  "wine_crawler.admin",
+]
+
+# Core layer provides browser/session/retry primitives.
+# It must never reach up into site implementations or admin.
+[[tool.importlinter.contracts]]
+name = "Core layer does not depend on higher layers"
+type = "forbidden"
+source_modules = ["wine_crawler.core"]
+forbidden_modules = [
+  "wine_crawler.sites",
+  "wine_crawler.admin",
+  "wine_crawler.cli",
+]
+
+# Sites layer implements per-site crawlers using core primitives.
+# It must never depend on the admin management layer.
+[[tool.importlinter.contracts]]
+name = "Sites layer does not depend on Admin"
+type = "forbidden"
+source_modules = ["wine_crawler.sites"]
+forbidden_modules = [
+  "wine_crawler.admin",
+  "wine_crawler.cli",
+]
+
+# Admin layer manages jobs/rules/schedules.
+# It must not reach into CLI internals.
+[[tool.importlinter.contracts]]
+name = "Admin layer does not depend on CLI"
+type = "forbidden"
+source_modules = ["wine_crawler.admin"]
+forbidden_modules = [
+  "wine_crawler.cli",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["wine_crawler*"]
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"

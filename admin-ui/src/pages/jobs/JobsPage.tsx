@@ -1,0 +1,122 @@
+import { Card } from "@/shared/ui/Card";
+import { Button } from "@/shared/ui/Button";
+import { StatusBadge } from "@/shared/ui/StatusBadge";
+import { Select } from "@/shared/ui/Select";
+import { Plus, RotateCcw } from "lucide-react";
+
+const mockJobs = [
+  {
+    id: "01JKX001",
+    site: "burghound",
+    rule: "search-results v3",
+    status: "success" as const,
+    items: 142,
+    duration: "3m 12s",
+    created: "2026-02-08 19:45",
+  },
+  {
+    id: "01JKX002",
+    site: "burghound",
+    rule: "search-results v3",
+    status: "success" as const,
+    items: 89,
+    duration: "2m 05s",
+    created: "2026-02-08 18:30",
+  },
+  {
+    id: "01JKX003",
+    site: "burghound",
+    rule: "wine-detail v2",
+    status: "failed" as const,
+    items: 0,
+    duration: "0m 42s",
+    created: "2026-02-08 17:00",
+  },
+  {
+    id: "01JKX004",
+    site: "burghound",
+    rule: "search-results v2",
+    status: "cancelled" as const,
+    items: 34,
+    duration: "1m 12s",
+    created: "2026-02-08 15:00",
+  },
+];
+
+export function JobsPage() {
+  return (
+    <div className="mx-auto max-w-5xl space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Select
+            options={[
+              { value: "all", label: "All Status" },
+              { value: "running", label: "Running" },
+              { value: "success", label: "Success" },
+              { value: "failed", label: "Failed" },
+            ]}
+          />
+          <Select
+            options={[
+              { value: "all", label: "All Sites" },
+              { value: "burghound", label: "burghound" },
+            ]}
+          />
+        </div>
+        <Button variant="primary" icon={<Plus size={14} />}>
+          New Job
+        </Button>
+      </div>
+
+      <Card className="p-0 overflow-hidden">
+        <table className="w-full text-left text-sm">
+          <thead>
+            <tr className="border-b border-border text-xs text-fg-subtle">
+              <th className="px-4 py-3 font-medium">ID</th>
+              <th className="px-4 py-3 font-medium">Site</th>
+              <th className="px-4 py-3 font-medium">Rule</th>
+              <th className="px-4 py-3 font-medium">Status</th>
+              <th className="px-4 py-3 font-medium text-right">Items</th>
+              <th className="px-4 py-3 font-medium text-right">Duration</th>
+              <th className="px-4 py-3 font-medium">Created</th>
+              <th className="px-4 py-3 font-medium" />
+            </tr>
+          </thead>
+          <tbody>
+            {mockJobs.map((j) => (
+              <tr
+                key={j.id}
+                className="border-b border-border/50 transition-colors hover:bg-surface-50"
+              >
+                <td className="px-4 py-3 font-mono text-xs text-fg-muted">
+                  {j.id.slice(-4)}
+                </td>
+                <td className="px-4 py-3 text-fg-secondary">{j.site}</td>
+                <td className="px-4 py-3">
+                  <span className="rounded bg-surface-200 px-1.5 py-0.5 font-mono text-[10px] text-fg-muted">
+                    {j.rule}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  <StatusBadge status={j.status} />
+                </td>
+                <td className="px-4 py-3 text-right font-mono text-xs text-fg-tertiary">
+                  {j.items}
+                </td>
+                <td className="px-4 py-3 text-right font-mono text-xs text-fg-subtle">
+                  {j.duration}
+                </td>
+                <td className="px-4 py-3 text-xs text-fg-subtle">{j.created}</td>
+                <td className="px-4 py-3">
+                  <Button size="sm" variant="ghost" icon={<RotateCcw size={12} />}>
+                    Rerun
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Card>
+    </div>
+  );
+}

@@ -1,0 +1,45 @@
+{
+  "include": ["src"],
+  "exclude": [
+    "**/__pycache__",
+    "**/node_modules",
+    ".venv",
+    "build",
+    "dist",
+    "admin-ui"
+  ],
+
+  "pythonVersion": "3.9",
+  "pythonPlatform": "All",
+  "typeCheckingMode": "standard",
+
+  "venvPath": ".",
+  "venv": ".venv",
+
+  "executionEnvironments": [
+    {
+      "root": "src",
+      "pythonVersion": "3.9",
+      "extraPaths": ["src"]
+    },
+    {
+      "root": "tests",
+      "pythonVersion": "3.9",
+      "extraPaths": ["src"]
+    }
+  ],
+
+  "reportImportCycles": "warning",
+  "reportMissingTypeStubs": "none",
+  "reportUnnecessaryTypeIgnoreComment": "none",
+  "reportUnnecessaryCast": "warning",
+  "reportUnnecessaryIsInstance": "warning",
+  "reportUnnecessaryComparison": "warning",
+  "reportUnnecessaryContains": "warning",
+  "reportDuplicateImport": "error",
+  "reportPrivateUsage": "warning",
+  "reportConstantRedefinition": "error",
+  "reportIncompatibleMethodOverride": "error",
+  "reportIncompatibleVariableOverride": "error",
+  "reportDeprecated": "warning"
+}

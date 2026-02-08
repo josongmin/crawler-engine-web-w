@@ -1,0 +1,26 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+dist/
+build/
+.env
+playwright/.cache/
+
+# Crawler artifacts
+data/
+downloads/
+traces/
+screenshots/
+storage_state/
+logs/
+
+# Admin DB
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
