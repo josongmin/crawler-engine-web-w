@@ -57,17 +57,15 @@ export function Sidebar() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <aside className="flex w-56 flex-col border-r border-border bg-surface-0">
+    <aside className="border-border bg-surface-0 flex w-56 flex-col border-r">
       {/* Logo */}
       <div className="flex h-14 items-center gap-2.5 px-5">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent-500 text-xs font-bold text-white">
+        <div className="bg-accent-500 flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold text-white">
           W
         </div>
         <div>
-          <div className="text-sm font-semibold text-fg">
-            Wine Crawler
-          </div>
-          <div className="text-[10px] text-fg-subtle">Admin</div>
+          <div className="text-fg text-sm font-semibold">Wine Crawler</div>
+          <div className="text-fg-subtle text-[10px]">Admin</div>
         </div>
       </div>
 
@@ -92,13 +90,12 @@ export function Sidebar() {
 
       {/* Sites section */}
       <div className="mt-5 px-3">
-        <div className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-widest text-fg-faint">
+        <div className="text-fg-faint mb-1.5 px-3 text-[10px] font-semibold tracking-widest uppercase">
           Sites
         </div>
         <nav className="flex flex-col gap-0.5">
           {SITES.map((site) => {
-            const status =
-              siteSessionStatus[site.id] ?? "inactive";
+            const status = siteSessionStatus[site.id] ?? "inactive";
             return (
               <NavLink
                 key={site.id}
@@ -116,20 +113,14 @@ export function Sidebar() {
                 <div
                   className={clsx(
                     "flex h-5 w-5 items-center justify-center rounded text-[9px] font-bold",
-                    siteBgMap[site.themeColor] ??
-                      "bg-accent-500/20 text-accent-fg",
+                    siteBgMap[site.themeColor] ?? "bg-accent-500/20 text-accent-fg",
                   )}
                 >
                   {site.name[0]}
                 </div>
                 <span className="flex-1 truncate">{site.name}</span>
                 {/* Status dot */}
-                <span
-                  className={clsx(
-                    "h-1.5 w-1.5 shrink-0 rounded-full",
-                    dotColors[status],
-                  )}
-                />
+                <span className={clsx("h-1.5 w-1.5 shrink-0 rounded-full", dotColors[status])} />
               </NavLink>
             );
           })}
@@ -138,7 +129,7 @@ export function Sidebar() {
 
       {/* Tools section */}
       <div className="mt-5 px-3">
-        <div className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-widest text-fg-faint">
+        <div className="text-fg-faint mb-1.5 px-3 text-[10px] font-semibold tracking-widest uppercase">
           Tools
         </div>
         <nav className="flex flex-col gap-0.5">
@@ -166,8 +157,8 @@ export function Sidebar() {
       <div className="flex-1" />
 
       {/* Theme switcher */}
-      <div className="border-t border-border px-4 py-3">
-        <div className="flex gap-0.5 rounded-lg border border-border bg-surface-0 p-0.5">
+      <div className="border-border border-t px-4 py-3">
+        <div className="border-border bg-surface-0 flex gap-0.5 rounded-lg border p-0.5">
           {themeOptions.map((opt) => (
             <button
               key={opt.value}
@@ -188,9 +179,9 @@ export function Sidebar() {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-border px-5 py-3">
-        <div className="flex items-center gap-2 text-xs text-fg-subtle">
-          <span className="h-1.5 w-1.5 rounded-full bg-status-success" />
+      <div className="border-border border-t px-5 py-3">
+        <div className="text-fg-subtle flex items-center gap-2 text-xs">
+          <span className="bg-status-success h-1.5 w-1.5 rounded-full" />
           API Connected
         </div>
       </div>

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from wine_crawler.admin.db.models import JobLog, JobLogCreate, utcnow
 from wine_crawler.admin.db.repositories.base import BaseRepository
 
@@ -38,7 +40,7 @@ class JobLogsRepository(BaseRepository[JobLog]):
         after_id: int | None = None,
     ) -> list[JobLog]:
         """Get logs for a job, optionally filtered by level, supporting cursor pagination."""
-        params: list = [job_id]
+        params: list[Any] = [job_id]
         sql = "SELECT * FROM job_logs WHERE job_id = ?"
 
         if level:

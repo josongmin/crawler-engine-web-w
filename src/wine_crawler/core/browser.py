@@ -1,3 +1,6 @@
+# pyright: reportMissingTypeStubs=false
+# playwright-stealth doesn't have type stubs
+
 """Browser lifecycle management with stealth and fingerprint injection."""
 
 from __future__ import annotations
@@ -41,6 +44,7 @@ class BrowserManager:
         storage_state: Path | None = None,
         persona: Persona | None = None,
     ) -> None:
+        # No parent class, so no super() call needed
         self._settings = settings
         self._storage_state = storage_state
         self._persona = persona
@@ -52,6 +56,7 @@ class BrowserManager:
     async def __aenter__(self) -> BrowserSession:
         # L1: Wrap async_playwright with stealth patches
         self._stealth_cm = Stealth().use_async(async_playwright())
+        assert self._stealth_cm is not None
         self._pw = await self._stealth_cm.__aenter__()
 
         # L5: Proxy support
@@ -155,7 +160,7 @@ async def with_session_browser(
     from wine_crawler.core.session import SessionManager
 
     sm = SessionManager(settings, site_name)
-    sm.migrate_legacy()
+    _ = sm.migrate_legacy()
 
     persona = sm.get_or_create_persona(force_new=force_new_persona)
     storage = sm.state_path if sm.state_path.exists() else None
@@ -165,5 +170,5 @@ async def with_session_browser(
         storage_state=storage,
         persona=persona,
     ) as session:
-        sm.touch()
+        _ = sm.touch()
         yield session

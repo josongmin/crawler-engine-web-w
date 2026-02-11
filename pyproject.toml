@@ -3,7 +3,7 @@ name = "wine-crawler"
 version = "0.1.0"
 description = "Playwright-based, extensible web crawler workspace"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
   "playwright>=1.41",
   "pydantic>=2.6",
@@ -29,6 +29,9 @@ admin = [
   "keyring>=25.0",
   "eval-type-backport>=0.2.0",
 ]
+aws = [
+  "boto3>=1.34",
+]
 dev = [
   # Linting & formatting
   "ruff>=0.6",
@@ -52,7 +55,7 @@ winecrawl = "wine_crawler.cli:app"
 
 # ── Ruff ──────────────────────────────────────────────────────────────
 [tool.ruff]
-target-version = "py39"
+target-version = "py310"
 line-length = 100
 fix = true
 show-fixes = true
@@ -134,6 +137,8 @@ ignore = [
 "tests/**/*.py" = ["S101", "ARG", "PLR2004", "T20", "S106", "PLC0415", "PT011", "PT012", "PT018"]
 # CLI: print/console output is expected; late imports for async
 "src/wine_crawler/cli.py" = ["T20", "PLC0415"]
+# Admin app: FastAPI factory is naturally long; late imports for optional deps
+"src/wine_crawler/admin/app.py" = ["PLR0915", "PLC0415"]
 # __init__.py: unused imports are re-exports
 "**/__init__.py" = ["F401"]
 # DB connection: lazy imports for circular-reference avoidance
@@ -148,6 +153,8 @@ ignore = [
 # Crawler implementations: complex control flow is inherent;
 # interface methods may leave args unused until implemented
 "src/wine_crawler/sites/*/crawler.py" = ["PLR0911", "PLR0912", "PLR0915", "ARG002"]
+# Worker script: print for CLI, /tmp is acceptable in containers
+"scripts/worker.py" = ["T201", "S108", "TC001"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["wine_crawler"]
@@ -172,15 +179,63 @@ line-ending = "auto"
 
 # ── Pyright (also configured in pyrightconfig.json for IDE) ───────────
 [tool.pyright]
-pythonVersion = "3.9"
-typeCheckingMode = "standard"
+pythonVersion = "3.10"
+typeCheckingMode = "strict"
 pythonPlatform = "All"
 include = ["src"]
 exclude = ["**/__pycache__", ".venv", "build", "dist", "admin-ui"]
+reportMissingImports = "error"
+reportMissingTypeStubs = "error"
+reportUnusedImport = "error"
+reportUnusedVariable = "error"
+reportUnusedFunction = "error"
+reportUnusedClass = "error"
+reportOptionalMemberAccess = "error"
+reportOptionalSubscript = "error"
+reportOptionalCall = "error"
+reportGeneralTypeIssues = "error"
+reportIncompatibleMethodOverride = "error"
+reportIncompatibleVariableOverride = "error"
+reportPrivateUsage = "error"
+reportUninitializedInstanceVariable = "error"
+reportUnknownParameterType = "error"
+reportUnknownArgumentType = "error"
+reportUnknownVariableType = "error"
+reportUnknownMemberType = "error"
+reportMissingParameterType = "error"
+reportMissingTypeArgument = "error"
+reportInvalidTypeVarUse = "error"
+reportOverlappingOverload = "error"
+reportMissingSuperCall = "error"
+reportUnnecessaryTypeIgnoreComment = "error"
+reportUnnecessaryCast = "error"
+reportUnnecessaryIsInstance = "error"
+reportUnnecessaryComparison = "error"
+reportUnnecessaryContains = "error"
+reportDuplicateImport = "error"
+reportConstantRedefinition = "error"
+reportDeprecated = "error"
+reportImportCycles = "error"
+reportInconsistentConstructor = "error"
+reportInvalidStringEscapeSequence = "error"
+reportCallInDefaultInitializer = "error"
+reportUnusedExcept = "error"
+reportUnusedExpression = "error"
+reportMatchNotExhaustive = "error"
+reportAssertAlwaysTrue = "error"
+reportSelfClsParameterName = "error"
+reportImplicitStringConcatenation = "error"
+reportUnusedCoroutine = "error"
+reportUnusedCallResult = "error"
+reportTypedDictNotRequiredAccess = "error"
+reportPrivateImportUsage = "error"
+reportOptionalIterable = "error"
+reportOptionalContextManager = "error"
+reportOptionalOperand = "error"
 
 # ── Mypy (secondary type-checker, kept for CI flexibility) ────────────
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true

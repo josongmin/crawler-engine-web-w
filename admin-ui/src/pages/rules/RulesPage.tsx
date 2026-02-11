@@ -42,9 +42,7 @@ export function RulesPage() {
     <div className="mx-auto max-w-4xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-fg-subtle">
-            Declarative extraction rules for each page type
-          </p>
+          <p className="text-fg-subtle text-sm">Declarative extraction rules for each page type</p>
         </div>
         <Button variant="primary" icon={<Plus size={14} />}>
           New Rule
@@ -54,20 +52,20 @@ export function RulesPage() {
       <div className="space-y-3">
         {mockRules.map((r) => (
           <Link key={r.id} to={`/rules/${r.id}`}>
-            <Card hover className="transition-all hover:border-accent-500/30">
+            <Card hover className="hover:border-accent-500/30 transition-all">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="rounded-lg bg-surface-100 p-2 text-fg-muted">
+                  <div className="bg-surface-100 text-fg-muted rounded-lg p-2">
                     <FileCode2 size={18} strokeWidth={1.6} />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-fg">{r.name}</span>
-                      <span className="rounded bg-surface-200 px-1.5 py-0.5 font-mono text-[10px] text-fg-subtle">
+                      <span className="text-fg text-sm font-semibold">{r.name}</span>
+                      <span className="bg-surface-200 text-fg-subtle rounded px-1.5 py-0.5 font-mono text-[10px]">
                         v{r.version}
                       </span>
                     </div>
-                    <div className="mt-0.5 flex items-center gap-3 text-xs text-fg-subtle">
+                    <div className="text-fg-subtle mt-0.5 flex items-center gap-3 text-xs">
                       <span>{r.page_type}</span>
                       <span>{r.fields} fields</span>
                       <span>{r.project}</span>
@@ -75,7 +73,7 @@ export function RulesPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-fg-faint">{r.updated}</span>
+                  <span className="text-fg-faint text-xs">{r.updated}</span>
                   <StatusBadge status={r.is_active ? "active" : "inactive"} />
                 </div>
               </div>

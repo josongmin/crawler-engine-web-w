@@ -1,3 +1,8 @@
+# pyright: reportImportCycles=false
+# pyright: reportUnnecessaryTypeIgnoreComment=false
+# Import cycles are intentional: connection -> schema -> connection (via lazy imports in _RepositoryBundle)
+# Type ignores for row_factory are necessary due to aiosqlite type stub limitations
+
 """Async SQLite connection manager with lifecycle, transactions, and repository access."""
 
 from __future__ import annotations
@@ -17,10 +22,12 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-def _row_factory(cursor: aiosqlite.Cursor, row: tuple) -> dict[str, Any]:
+def _row_factory(cursor: aiosqlite.Cursor, row: tuple[Any, ...]) -> dict[str, Any]:
     """Convert rows to dicts keyed by column name."""
-    columns = [col[0] for col in cursor.description]  # type: ignore[union-attr]
-    return dict(zip(columns, row))
+    if not cursor.description:
+        return {}
+    columns = [col[0] for col in cursor.description]
+    return dict(zip(columns, row, strict=False))
 
 
 class Database:
@@ -40,6 +47,7 @@ class Database:
     """
 
     def __init__(self, db_path: Path) -> None:
+        # Database doesn't inherit from any class, so no super() call needed
         self._db_path = db_path
         self._conn: aiosqlite.Connection | None = None
         # Lazy-init: repositories are created after connect()
@@ -58,12 +66,13 @@ class Database:
         conn = await aiosqlite.connect(str(self._db_path))
 
         # Performance & safety pragmas
-        await conn.execute("PRAGMA journal_mode = WAL")
-        await conn.execute("PRAGMA foreign_keys = ON")
-        await conn.execute("PRAGMA busy_timeout = 5000")
-        await conn.execute("PRAGMA synchronous = NORMAL")
-        await conn.execute("PRAGMA cache_size = -8000")  # 8 MB
+        _ = await conn.execute("PRAGMA journal_mode = WAL")
+        _ = await conn.execute("PRAGMA foreign_keys = ON")
+        _ = await conn.execute("PRAGMA busy_timeout = 5000")
+        _ = await conn.execute("PRAGMA synchronous = NORMAL")
+        _ = await conn.execute("PRAGMA cache_size = -8000")  # 8 MB
 
+        # aiosqlite.Connection.row_factory accepts Callable | None
         conn.row_factory = _row_factory  # type: ignore[assignment]
         self._conn = conn
 
@@ -112,12 +121,12 @@ class Database:
         params_seq: Sequence[Sequence[Any]],
     ) -> None:
         """Execute a SQL statement for each parameter set."""
-        await self.connection.executemany(sql, params_seq)
+        _ = await self.connection.executemany(sql, params_seq)
         await self.connection.commit()
 
     async def execute_script(self, sql: str) -> None:
         """Execute a multi-statement SQL script."""
-        await self.connection.executescript(sql)
+        _ = await self.connection.executescript(sql)
 
     async def fetch_one(
         self,
@@ -126,7 +135,9 @@ class Database:
     ) -> dict[str, Any] | None:
         """Return a single row as a dict, or None."""
         cursor = await self.connection.execute(sql, params or [])
-        return await cursor.fetchone()  # type: ignore[return-value]
+        row = await cursor.fetchone()
+        # row_factory converts rows to dict[str, Any]
+        return row if isinstance(row, dict) else None
 
     async def fetch_all(
         self,
@@ -135,7 +146,11 @@ class Database:
     ) -> list[dict[str, Any]]:
         """Return all matching rows as dicts."""
         cursor = await self.connection.execute(sql, params or [])
-        return await cursor.fetchall()  # type: ignore[return-value]
+        rows = await cursor.fetchall()
+        # row_factory converts rows to dict[str, Any]
+        if not rows:
+            return []
+        return [row for row in rows if isinstance(row, dict)]
 
     async def fetch_val(
         self,
@@ -146,13 +161,17 @@ class Database:
         # Temporarily bypass row_factory for scalar access
         conn = self.connection
         old_factory = conn.row_factory
-        conn.row_factory = None  # type: ignore[assignment]
+        # aiosqlite.Connection.row_factory accepts Callable | None
+        # Setting to None temporarily for scalar queries
+        conn.row_factory = None  # pyright: ignore[reportAssignmentType]
         try:
             cursor = await conn.execute(sql, params or [])
             row = await cursor.fetchone()
-            return row[0] if row else None  # type: ignore[index]
+            if row and isinstance(row, tuple) and len(row) > 0:
+                return row[0]
+            return None
         finally:
-            conn.row_factory = old_factory  # type: ignore[assignment]
+            conn.row_factory = old_factory  # pyright: ignore[reportAssignmentType]
 
     @asynccontextmanager
     async def transaction(self) -> AsyncIterator[None]:
@@ -189,6 +208,7 @@ class _RepositoryBundle:
     """Aggregates all repositories for convenient access via ``db.repos.*``."""
 
     def __init__(self, db: Database) -> None:
+        # _RepositoryBundle doesn't inherit from any class, so no super() call needed
         # Lazy imports to avoid circular references
         from wine_crawler.admin.db.repositories.crawl_rules import CrawlRulesRepository
         from wine_crawler.admin.db.repositories.credentials import CredentialsRepository
@@ -205,6 +225,11 @@ class _RepositoryBundle:
         from wine_crawler.admin.db.repositories.site_capabilities import (
             SiteCapabilitiesRepository,
         )
+        from wine_crawler.admin.db.repositories.workflow_node_logs import (
+            WorkflowNodeLogsRepository,
+        )
+        from wine_crawler.admin.db.repositories.workflow_runs import WorkflowRunsRepository
+        from wine_crawler.admin.db.repositories.workflows import WorkflowsRepository
 
         self.jobs = JobsRepository(db)
         self.job_logs = JobLogsRepository(db)
@@ -217,3 +242,6 @@ class _RepositoryBundle:
         self.rule_versions = RuleVersionsRepository(db)
         self.rule_test_results = RuleTestResultsRepository(db)
         self.kv_store = KVStoreRepository(db)
+        self.workflows = WorkflowsRepository(db)
+        self.workflow_runs = WorkflowRunsRepository(db)
+        self.workflow_node_logs = WorkflowNodeLogsRepository(db)

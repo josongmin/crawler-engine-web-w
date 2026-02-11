@@ -8,8 +8,17 @@ reads.
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from typing import Any
 
 from pydantic import BaseModel
+
+from wine_crawler.admin.db.enums import (
+    ActionCategory,
+    LintSeverity,
+    ResourceType,
+    RunStatus,
+    WorkflowStatus,
+)
 
 # ------------------------------------------------------------------
 # Helpers
@@ -325,3 +334,147 @@ class RuleTestResultCreate(BaseModel):
 class KVEntry(BaseModel):
     key: str
     value: str
+
+
+# ------------------------------------------------------------------
+# Action Catalog (in-memory, not stored in DB)
+# ------------------------------------------------------------------
+
+
+class ActionConfigField(BaseModel):
+    """Schema for a single configurable field on an action."""
+
+    key: str
+    label: str
+    type: str
+    options: list[dict[str, str]] | None = None
+    default: Any = None
+    placeholder: str | None = None
+
+
+class ActionDef(BaseModel):
+    """An action in the catalog — declarative spec, not DB-stored."""
+
+    action_id: str
+    site: str  # "*" for site-agnostic
+    category: ActionCategory
+    name: str
+    description: str
+    requires: list[ResourceType]
+    provides: list[ResourceType]
+    inputs_schema: list[ActionConfigField]
+    outputs_schema: list[str]
+    branches: list[str] | None = None
+    failure_modes: list[str] | None = None
+    has_error_output: bool = False
+
+
+# ------------------------------------------------------------------
+# Workflows
+# ------------------------------------------------------------------
+
+
+class Workflow(BaseModel):
+    id: str
+    name: str
+    site: str
+    description: str | None = None
+    status: WorkflowStatus = WorkflowStatus.DRAFT
+    graph_json: str
+    compiled_json: str | None = None
+    version: int = 1
+    created_at: str
+    updated_at: str
+
+
+class WorkflowCreate(BaseModel):
+    name: str
+    site: str
+    description: str | None = None
+    graph_json: str
+
+
+class WorkflowUpdate(BaseModel):
+    name: str | None = None
+    site: str | None = None
+    description: str | None = None
+    graph_json: str | None = None
+    status: WorkflowStatus | None = None
+    compiled_json: str | None = None
+
+
+# ------------------------------------------------------------------
+# Workflow Runs
+# ------------------------------------------------------------------
+
+
+class WorkflowRun(BaseModel):
+    id: str
+    workflow_id: str
+    status: RunStatus = RunStatus.PENDING
+    node_states_json: str | None = None
+    started_at: str | None = None
+    finished_at: str | None = None
+    duration_ms: int | None = None
+    error: str | None = None
+    created_at: str
+
+
+class WorkflowRunCreate(BaseModel):
+    workflow_id: str
+
+
+# ------------------------------------------------------------------
+# Workflow Node Logs
+# ------------------------------------------------------------------
+
+
+class WorkflowNodeLog(BaseModel):
+    id: int
+    run_id: str
+    node_id: str
+    level: str
+    message: str
+    timestamp: str
+    data_json: str | None = None
+
+
+class WorkflowNodeLogCreate(BaseModel):
+    run_id: str
+    node_id: str
+    level: str
+    message: str
+    data_json: str | None = None
+
+
+# ------------------------------------------------------------------
+# Lint / Compile Results (ephemeral — returned from API, not stored)
+# ------------------------------------------------------------------
+
+
+class LintDiagnostic(BaseModel):
+    node_id: str | None = None
+    severity: LintSeverity
+    code: str
+    message: str
+
+
+class LintResult(BaseModel):
+    valid: bool
+    diagnostics: list[LintDiagnostic]
+
+
+class CompiledNode(BaseModel):
+    node_id: str
+    action_id: str
+    config: dict[str, Any]
+    depends_on: list[str]
+    auto_inserted: bool = False
+
+
+class CompileResult(BaseModel):
+    valid: bool
+    execution_order: list[str]
+    nodes: list[CompiledNode]
+    diagnostics: list[LintDiagnostic]
+    auto_inserted_nodes: list[str]

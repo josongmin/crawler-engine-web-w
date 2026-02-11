@@ -69,7 +69,7 @@ backend-mypy:
 # Architecture lint (import contracts)
 backend-arch:
     @echo "🏗️ Checking architecture contracts..."
-    python -m lint-imports 2>/dev/null || lint-imports
+    python -m importlinter 2>/dev/null || lint-imports
 
 # Run backend tests
 backend-test:

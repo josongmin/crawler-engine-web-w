@@ -26,8 +26,6 @@ export const useSessionStore = create<SessionState>((set) => ({
   setCookies: (cookies) => set({ cookies }),
   updateSession: (site, patch) =>
     set((state) => ({
-      sessions: state.sessions.map((s) =>
-        s.site === site ? { ...s, ...patch } : s,
-      ),
+      sessions: state.sessions.map((s) => (s.site === site ? { ...s, ...patch } : s)),
     })),
 }));

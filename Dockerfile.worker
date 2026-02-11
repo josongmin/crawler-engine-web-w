@@ -1,0 +1,31 @@
+# Crawler Worker (SQS Consumer)
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Install system dependencies + Playwright browser
+RUN apt-get update && apt-get install -y \
+    wget gnupg ca-certificates \
+    libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 \
+    libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 \
+    libxfixes3 libxrandr2 libgbm1 libasound2 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Playwright
+RUN pip install --no-cache-dir playwright && \
+    playwright install chromium && \
+    playwright install-deps chromium
+
+# Install Python dependencies
+COPY pyproject.toml ./
+RUN pip install --no-cache-dir -e ".[admin]" boto3
+
+# Copy application code
+COPY src/ ./src/
+COPY scripts/worker.py ./scripts/
+
+# Make worker executable
+RUN chmod +x scripts/worker.py
+
+# Run worker
+CMD ["python", "scripts/worker.py"]

@@ -50,15 +50,25 @@ const MOCK_LOG_LINES = [
   { time: "19:41:44", level: "INFO", msg: "Loading persona: Chrome/144.0 on macOS" },
   { time: "19:41:45", level: "INFO", msg: "Navigating to target URL" },
   { time: "19:41:47", level: "INFO", msg: "Applying rule: search-results v3" },
-  { time: "19:41:48", level: "INFO", msg: 'Container matched: 25 rows in "table#results tbody tr"' },
-  { time: "19:41:48", level: "INFO", msg: "Extracting fields: producer, wine, vintage, score, detail_url" },
+  {
+    time: "19:41:48",
+    level: "INFO",
+    msg: 'Container matched: 25 rows in "table#results tbody tr"',
+  },
+  {
+    time: "19:41:48",
+    level: "INFO",
+    msg: "Extracting fields: producer, wine, vintage, score, detail_url",
+  },
   { time: "19:41:49", level: "INFO", msg: "All selectors validated: 25/25 matched" },
   { time: "19:41:49", level: "INFO", msg: "Extraction complete: 25 items in 3420ms" },
 ];
 
 export function PlaygroundPage() {
   const [tab, setTab] = useState<Tab>("scrape");
-  const [url, setUrl] = useState("https://www.burghound.com/tnsearch/tasting_notes.php?search=romanee");
+  const [url, setUrl] = useState(
+    "https://www.burghound.com/tnsearch/tasting_notes.php?search=romanee",
+  );
   const [isRunning, setIsRunning] = useState(false);
   const [hasResult, setHasResult] = useState(false);
 
@@ -80,9 +90,9 @@ export function PlaygroundPage() {
   return (
     <div className="mx-auto max-w-7xl">
       {/* Hero bar */}
-      <Card glow className="mb-6 border-accent-500/20">
+      <Card glow className="border-accent-500/20 mb-6">
         <div className="flex items-center gap-4">
-          <div className="flex rounded-lg border border-border bg-surface-0 p-0.5">
+          <div className="border-border bg-surface-0 flex rounded-lg border p-0.5">
             {tabs.map((t) => (
               <button
                 key={t.id}
@@ -107,7 +117,7 @@ export function PlaygroundPage() {
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="https://..."
-                className="h-10 w-full rounded-lg border border-border bg-surface-0 pl-4 pr-4 font-mono text-sm text-fg-secondary placeholder:text-fg-faint focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500/30"
+                className="border-border bg-surface-0 text-fg-secondary placeholder:text-fg-faint focus:border-accent-500 focus:ring-accent-500/30 h-10 w-full rounded-lg border pr-4 pl-4 font-mono text-sm focus:ring-1 focus:outline-none"
               />
             </div>
 
@@ -136,7 +146,7 @@ export function PlaygroundPage() {
         </div>
 
         {/* Options row */}
-        <div className="mt-3 flex items-center gap-6 text-xs text-fg-subtle">
+        <div className="text-fg-subtle mt-3 flex items-center gap-6 text-xs">
           {tab === "scrape" && (
             <>
               <label className="flex items-center gap-1.5">
@@ -152,7 +162,7 @@ export function PlaygroundPage() {
                 <input
                   type="number"
                   defaultValue={10}
-                  className="ml-1 h-6 w-14 rounded border border-border bg-surface-0 px-2 text-xs text-fg-tertiary focus:border-accent-500 focus:outline-none"
+                  className="border-border bg-surface-0 text-fg-tertiary focus:border-accent-500 ml-1 h-6 w-14 rounded border px-2 text-xs focus:outline-none"
                 />
               </label>
             </>
@@ -172,7 +182,13 @@ export function PlaygroundPage() {
           {tab === "export-kit" && (
             <>
               <label className="flex items-center gap-1.5">
-                <input type="radio" name="fmt" value="curl" defaultChecked className="accent-accent-500" />
+                <input
+                  type="radio"
+                  name="fmt"
+                  value="curl"
+                  defaultChecked
+                  className="accent-accent-500"
+                />
                 cURL
               </label>
               <label className="flex items-center gap-1.5">
@@ -198,12 +214,10 @@ export function PlaygroundPage() {
           {/* Left: Live log */}
           <Card className="col-span-1">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+              <h3 className="text-fg-subtle text-xs font-semibold tracking-wider uppercase">
                 Live Log
               </h3>
-              {isRunning && (
-                <Loader2 size={14} className="animate-spin text-accent-fg" />
-              )}
+              {isRunning && <Loader2 size={14} className="text-accent-fg animate-spin" />}
             </div>
             <div className="space-y-0.5 font-mono text-[11px] leading-5">
               {MOCK_LOG_LINES.map((l, i) => (
@@ -237,9 +251,9 @@ export function PlaygroundPage() {
                 {/* Stats bar */}
                 <div className="flex items-center gap-4">
                   <StatusBadge status="success" />
-                  <span className="font-mono text-xs text-fg-muted">25 items</span>
-                  <span className="font-mono text-xs text-fg-subtle">3420ms</span>
-                  <span className="font-mono text-xs text-fg-subtle">status: 200</span>
+                  <span className="text-fg-muted font-mono text-xs">25 items</span>
+                  <span className="text-fg-subtle font-mono text-xs">3420ms</span>
+                  <span className="text-fg-subtle font-mono text-xs">status: 200</span>
                 </div>
                 <Card className="p-0">
                   <CodeBlock code={MOCK_RESULT} language="json" />
@@ -253,13 +267,13 @@ export function PlaygroundPage() {
       {/* Empty state */}
       {!isRunning && !hasResult && (
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <div className="mb-4 rounded-2xl bg-surface-50 p-6">
+          <div className="bg-surface-50 mb-4 rounded-2xl p-6">
             <FlaskConical size={40} className="text-fg-faint" strokeWidth={1.2} />
           </div>
-          <h3 className="text-lg font-medium text-fg-tertiary">Ready to crawl</h3>
-          <p className="mt-1 max-w-md text-sm text-fg-subtle">
-            Enter a URL above and hit Run to scrape a page, test a rule against live data,
-            or export a Request Kit for external use.
+          <h3 className="text-fg-tertiary text-lg font-medium">Ready to crawl</h3>
+          <p className="text-fg-subtle mt-1 max-w-md text-sm">
+            Enter a URL above and hit Run to scrape a page, test a rule against live data, or export
+            a Request Kit for external use.
           </p>
         </div>
       )}

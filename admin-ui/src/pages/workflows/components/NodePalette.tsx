@@ -11,13 +11,11 @@ export function NodePalette() {
   };
 
   return (
-    <div className="flex w-52 flex-col border-r border-border bg-surface-0 overflow-y-auto">
+    <div className="border-border bg-surface-0 flex w-52 flex-col overflow-y-auto border-r">
       {/* Header */}
-      <div className="border-b border-border px-4 py-3">
-        <h3 className="text-xs font-semibold text-fg-tertiary">Nodes</h3>
-        <p className="mt-0.5 text-[10px] text-fg-faint">
-          Drag onto the canvas
-        </p>
+      <div className="border-border border-b px-4 py-3">
+        <h3 className="text-fg-tertiary text-xs font-semibold">Nodes</h3>
+        <p className="text-fg-faint mt-0.5 text-[10px]">Drag onto the canvas</p>
       </div>
 
       {/* Categories */}
@@ -29,7 +27,7 @@ export function NodePalette() {
             <div key={cat.id}>
               <div
                 className={clsx(
-                  "mb-1.5 text-[10px] font-semibold uppercase tracking-widest",
+                  "mb-1.5 text-[10px] font-semibold tracking-widest uppercase",
                   cat.color,
                 )}
               >
@@ -37,11 +35,7 @@ export function NodePalette() {
               </div>
               <div className="space-y-0.5">
                 {nodes.map((node) => (
-                  <PaletteItem
-                    key={node.type}
-                    node={node}
-                    onDragStart={onDragStart}
-                  />
+                  <PaletteItem key={node.type} node={node} onDragStart={onDragStart} />
                 ))}
               </div>
             </div>
@@ -67,17 +61,17 @@ function PaletteItem({
     <div
       draggable
       onDragStart={(e) => onDragStart(e, node.type)}
-      className="group flex cursor-grab items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors hover:bg-surface-100 active:cursor-grabbing"
+      className="group hover:bg-surface-100 flex cursor-grab items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors active:cursor-grabbing"
       title={node.description}
     >
       <div className={clsx("rounded-md p-1.5", node.colorClass)}>
         <Icon size={12} strokeWidth={2} />
       </div>
       <div className="min-w-0 flex-1">
-        <div className="truncate text-xs font-medium text-fg-tertiary group-hover:text-fg">
+        <div className="text-fg-tertiary group-hover:text-fg truncate text-xs font-medium">
           {node.name}
         </div>
-        <div className="truncate text-[10px] text-fg-faint group-hover:text-fg-subtle">
+        <div className="text-fg-faint group-hover:text-fg-subtle truncate text-[10px]">
           {node.description}
         </div>
       </div>

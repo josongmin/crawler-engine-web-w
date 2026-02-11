@@ -74,7 +74,7 @@ class BurghoundCrawler(SiteCrawler):
         try:
             page = await session.context.new_page()
             try:
-                await page.goto(self.BASE_URL)
+                _ = await page.goto(self.BASE_URL)
                 await page.wait_for_load_state("networkidle")
                 await medium_pause()
 
@@ -90,7 +90,7 @@ class BurghoundCrawler(SiteCrawler):
         finally:
             # ALWAYS logout to avoid 1-hour account lockout
             logger.info("Logging out to release server session…")
-            await self._logout(session, logger=logger, session_mgr=sm)
+            _ = await self._logout(session, logger=logger, session_mgr=sm)
 
     # ------------------------------------------------------------------
     # Login helpers (standalone, also callable from CLI ``login`` command)
@@ -115,13 +115,13 @@ class BurghoundCrawler(SiteCrawler):
         if not force and await self._is_logged_in(session, logger=logger):
             logger.info("Already logged in (session still valid)")
             if session_mgr:
-                session_mgr.touch()
+                _ = session_mgr.touch()
             return True
 
         page = await session.context.new_page()
         try:
             logger.info("Navigating to %s", self.BASE_URL)
-            await page.goto(self.BASE_URL)
+            _ = await page.goto(self.BASE_URL)
             await page.wait_for_load_state("domcontentloaded")
             await human_delay(base=2.0, sigma=0.5)
 
@@ -175,15 +175,15 @@ class BurghoundCrawler(SiteCrawler):
                 try:
                     ss_dir = settings.screenshots_dir
                     ss_dir.mkdir(parents=True, exist_ok=True)
-                    await page.screenshot(path=str(ss_dir / "post_login.png"))
+                    _ = await page.screenshot(path=str(ss_dir / "post_login.png"))
                 except Exception:
                     pass
 
             # -- check for account lockout --------------------------------
             if await self._is_account_locked(page):
                 logger.error(
-                    "Account locked: previous session was not logged out. "
-                    "Wait ~1 hour or log out from another browser."
+                    ("Account locked: previous session was not logged out. "
+                     "Wait ~1 hour or log out from another browser.")
                 )
                 if session_mgr:
                     session_mgr.mark_expired()
@@ -208,12 +208,12 @@ class BurghoundCrawler(SiteCrawler):
 
             # -- persist session -----------------------------------------
             if session_mgr:
-                await session.context.storage_state(path=str(session_mgr.state_path))
+                _ = await session.context.storage_state(path=str(session_mgr.state_path))
                 ua = ""
                 persona = session_mgr.load_persona()
                 if persona:
                     ua = persona.user_agent
-                session_mgr.mark_login(user_agent=ua)
+                _ = session_mgr.mark_login(user_agent=ua)
                 logger.info("Session saved to %s", session_mgr.session_dir)
 
             return True
@@ -244,7 +244,7 @@ class BurghoundCrawler(SiteCrawler):
         """
         page = await session.context.new_page()
         try:
-            await page.goto(self.BASE_URL)
+            _ = await page.goto(self.BASE_URL)
             await page.wait_for_load_state("networkidle", timeout=12_000)
             await human_delay(base=1.0, sigma=0.3)
 
@@ -273,7 +273,7 @@ class BurghoundCrawler(SiteCrawler):
 
                         logger.info("Logout successful")
                         if session_mgr:
-                            session_mgr.mark_logout()
+                            _ = session_mgr.mark_logout()
                         return True
                 except Exception:
                     continue
@@ -303,7 +303,7 @@ class BurghoundCrawler(SiteCrawler):
         """Open the login page and check whether we're already authenticated."""
         page = await session.context.new_page()
         try:
-            await page.goto(self.BASE_URL)
+            _ = await page.goto(self.BASE_URL)
             await page.wait_for_load_state("networkidle", timeout=12_000)
             await human_delay(base=1.5, sigma=0.3)
 

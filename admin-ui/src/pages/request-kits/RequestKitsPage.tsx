@@ -34,7 +34,10 @@ print(r.status_code, len(r.text))`;
 const snippets: Record<string, { code: string; lang: string }> = {
   curl: { code: MOCK_CURL, lang: "bash" },
   httpx: { code: MOCK_HTTPX, lang: "python" },
-  cookies: { code: "# Netscape HTTP Cookie File\n.burghound.com\tTRUE\t/\tFALSE\t1717829400\tPHPSESSID\tabc123def456", lang: "text" },
+  cookies: {
+    code: "# Netscape HTTP Cookie File\n.burghound.com\tTRUE\t/\tFALSE\t1717829400\tPHPSESSID\tabc123def456",
+    lang: "text",
+  },
 };
 
 const history = [
@@ -53,9 +56,9 @@ export function RequestKitsPage() {
       {/* Export Panel */}
       <Card glow>
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-fg">
+          <h2 className="text-fg text-base font-semibold">
             Export Request Kit
-            <span className="ml-2 text-sm font-normal text-fg-subtle">burghound</span>
+            <span className="text-fg-subtle ml-2 text-sm font-normal">burghound</span>
           </h2>
           <StatusBadge status="active" />
         </div>
@@ -93,7 +96,7 @@ export function RequestKitsPage() {
       <div className="grid grid-cols-2 gap-4">
         {/* Kit Health */}
         <Card>
-          <h3 className="mb-3 text-sm font-semibold text-fg-tertiary">Kit Health</h3>
+          <h3 className="text-fg-tertiary mb-3 text-sm font-semibold">Kit Health</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-fg-subtle">Session valid</span>
@@ -121,22 +124,22 @@ export function RequestKitsPage() {
 
         {/* Export History */}
         <Card>
-          <h3 className="mb-3 text-sm font-semibold text-fg-tertiary">Export History</h3>
+          <h3 className="text-fg-tertiary mb-3 text-sm font-semibold">Export History</h3>
           <div className="space-y-2">
             {history.map((h) => (
               <div
                 key={h.id}
-                className="flex items-center justify-between rounded-lg bg-surface-0 px-3 py-2"
+                className="bg-surface-0 flex items-center justify-between rounded-lg px-3 py-2"
               >
                 <div className="flex items-center gap-3">
-                  <span className="font-mono text-xs text-fg-subtle">{h.id}</span>
-                  <span className="rounded bg-surface-200 px-1.5 py-0.5 font-mono text-[10px] text-fg-muted">
+                  <span className="text-fg-subtle font-mono text-xs">{h.id}</span>
+                  <span className="bg-surface-200 text-fg-muted rounded px-1.5 py-0.5 font-mono text-[10px]">
                     {h.format}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-fg-subtle">{h.ago}</span>
-                  <span className="text-xs text-fg-subtle">used {h.used}x</span>
+                  <span className="text-fg-subtle text-xs">{h.ago}</span>
+                  <span className="text-fg-subtle text-xs">used {h.used}x</span>
                   <StatusBadge status={h.status} />
                 </div>
               </div>

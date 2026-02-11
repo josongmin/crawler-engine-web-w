@@ -1,0 +1,15 @@
+---
+description: Python architecture boundaries (enforced)
+globs:
+  - "src/**/*.py"
+---
+
+## Layer boundaries (enforced by import-linter)
+
+- `wine_crawler.config` and `wine_crawler.logging` are foundation modules and must not import `wine_crawler.core`, `wine_crawler.sites`, or `wine_crawler.admin`.
+- `wine_crawler.core` must not import `wine_crawler.sites`, `wine_crawler.admin`, or `wine_crawler.cli`.
+- `wine_crawler.sites` must not import `wine_crawler.admin` or `wine_crawler.cli`.
+- `wine_crawler.admin` must not import `wine_crawler.cli`.
+
+When adding new modules, keep imports flowing downward only.
+

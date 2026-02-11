@@ -28,14 +28,7 @@ interface Props {
 
 // ── Component ──────────────────────────────────────────
 
-export function SessionPanel({
-  site,
-  session,
-  onLogin,
-  onLogout,
-  onPasteAuth,
-  onRefresh,
-}: Props) {
+export function SessionPanel({ site, session, onLogin, onLogout, onPasteAuth, onRefresh }: Props) {
   // ── Not connected ───────────────────────────────────
   if (!session) {
     return (
@@ -43,30 +36,19 @@ export function SessionPanel({
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
             <div className="flex items-center gap-2.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-surface-400" />
-              <span className="text-sm font-semibold text-fg-tertiary">
-                Not Connected
-              </span>
+              <span className="bg-surface-400 h-2.5 w-2.5 rounded-full" />
+              <span className="text-fg-tertiary text-sm font-semibold">Not Connected</span>
             </div>
-            <p className="mt-1.5 text-xs leading-relaxed text-fg-faint">
+            <p className="text-fg-faint mt-1.5 text-xs leading-relaxed">
               Login or paste authentication cookies to start using{" "}
               <span className="text-fg-subtle">{site.name}</span>
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <Button
-              variant="primary"
-              size="sm"
-              icon={<LogIn size={14} />}
-              onClick={onLogin}
-            >
+            <Button variant="primary" size="sm" icon={<LogIn size={14} />} onClick={onLogin}>
               Login
             </Button>
-            <Button
-              size="sm"
-              icon={<ClipboardPaste size={14} />}
-              onClick={onPasteAuth}
-            >
+            <Button size="sm" icon={<ClipboardPaste size={14} />} onClick={onPasteAuth}>
               Paste Auth
             </Button>
           </div>
@@ -89,12 +71,10 @@ export function SessionPanel({
           <div className="flex items-center gap-3">
             <StatusBadge status={session.status} />
             {isHealthy && (
-              <span className="text-xs font-medium text-fg-subtle">
-                TTL {session.ttlRemaining}
-              </span>
+              <span className="text-fg-subtle text-xs font-medium">TTL {session.ttlRemaining}</span>
             )}
             {isExpired && (
-              <span className="text-xs font-medium text-status-danger/80">
+              <span className="text-status-danger/80 text-xs font-medium">
                 Session expired — re-login required
               </span>
             )}
@@ -103,9 +83,9 @@ export function SessionPanel({
           {/* TTL progress bar */}
           {isHealthy && (
             <div className="max-w-xs space-y-1">
-              <div className="h-1.5 rounded-full bg-surface-200">
+              <div className="bg-surface-200 h-1.5 rounded-full">
                 <div
-                  className="h-full rounded-full bg-status-success/60 transition-all duration-500"
+                  className="bg-status-success/60 h-full rounded-full transition-all duration-500"
                   style={{ width: `${session.ttlPct}%` }}
                 />
               </div>
@@ -113,17 +93,15 @@ export function SessionPanel({
           )}
 
           {/* Meta row */}
-          <div className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-fg-subtle">
+          <div className="text-fg-subtle flex flex-wrap gap-x-5 gap-y-1 text-xs">
             <span>Uses: {session.useCount}</span>
             <span>Last login: {session.lastLogin}</span>
-            <span>
-              Clean close: {session.cleanClose ? "yes" : "no"}
-            </span>
+            <span>Clean close: {session.cleanClose ? "yes" : "no"}</span>
             {session.kitExported && <span>Kit: exported</span>}
           </div>
 
           {/* Persona */}
-          <div className="inline-block rounded-md bg-surface-0 px-2.5 py-1.5 font-mono text-[11px] text-fg-subtle">
+          <div className="bg-surface-0 text-fg-subtle inline-block rounded-md px-2.5 py-1.5 font-mono text-[11px]">
             {session.userAgent}
           </div>
         </div>
@@ -132,44 +110,22 @@ export function SessionPanel({
         <div className="flex shrink-0 flex-wrap items-start gap-2">
           {isExpired || isLoggedOut ? (
             <>
-              <Button
-                variant="primary"
-                size="sm"
-                icon={<LogIn size={14} />}
-                onClick={onLogin}
-              >
+              <Button variant="primary" size="sm" icon={<LogIn size={14} />} onClick={onLogin}>
                 Re-login
               </Button>
-              <Button
-                size="sm"
-                icon={<ClipboardPaste size={14} />}
-                onClick={onPasteAuth}
-              >
+              <Button size="sm" icon={<ClipboardPaste size={14} />} onClick={onPasteAuth}>
                 Paste Auth
               </Button>
             </>
           ) : (
             <>
-              <Button
-                size="sm"
-                icon={<RefreshCw size={14} />}
-                onClick={onRefresh}
-              >
+              <Button size="sm" icon={<RefreshCw size={14} />} onClick={onRefresh}>
                 Refresh
               </Button>
-              <Button
-                size="sm"
-                icon={<ClipboardPaste size={14} />}
-                onClick={onPasteAuth}
-              >
+              <Button size="sm" icon={<ClipboardPaste size={14} />} onClick={onPasteAuth}>
                 Paste Auth
               </Button>
-              <Button
-                size="sm"
-                variant="danger"
-                icon={<LogOut size={14} />}
-                onClick={onLogout}
-              >
+              <Button size="sm" variant="danger" icon={<LogOut size={14} />} onClick={onLogout}>
                 Logout
               </Button>
             </>

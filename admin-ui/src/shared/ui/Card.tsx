@@ -12,8 +12,8 @@ export function Card({ children, className, hover, glow }: Props) {
   return (
     <div
       className={clsx(
-        "rounded-xl border border-border bg-surface-50 p-5",
-        hover && "transition-colors hover:border-border-hover",
+        "border-border bg-surface-50 rounded-xl border p-5",
+        hover && "hover:border-border-hover transition-colors",
         glow && "glow-accent",
         className,
       )}

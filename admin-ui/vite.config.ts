@@ -23,4 +23,18 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunks
+          "react-vendor": ["react", "react-dom", "react-router-dom"],
+          "query-vendor": ["@tanstack/react-query"],
+          "flow-vendor": ["@xyflow/react"],
+          "ui-vendor": ["lucide-react", "clsx"],
+        },
+      },
+    },
+  },
 });

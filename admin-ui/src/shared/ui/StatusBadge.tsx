@@ -26,15 +26,11 @@ const statusCategoryMap: Record<string, StatusCategory> = {
 };
 
 const categoryStyles: Record<StatusCategory, string> = {
-  success:
-    "bg-status-success-muted text-status-success border-status-success-subtle",
-  danger:
-    "bg-status-danger-muted text-status-danger border-status-danger-subtle",
-  warning:
-    "bg-status-warning-muted text-status-warning border-status-warning-subtle",
+  success: "bg-status-success-muted text-status-success border-status-success-subtle",
+  danger: "bg-status-danger-muted text-status-danger border-status-danger-subtle",
+  warning: "bg-status-warning-muted text-status-warning border-status-warning-subtle",
   info: "bg-status-info-muted text-status-info border-status-info-subtle",
-  neutral:
-    "bg-status-neutral-muted text-status-neutral border-status-neutral-subtle",
+  neutral: "bg-status-neutral-muted text-status-neutral border-status-neutral-subtle",
 };
 
 const dotCategoryMap: Record<string, StatusCategory | undefined> = {
@@ -66,11 +62,7 @@ export function StatusBadge({ status }: { status: string }) {
         categoryStyles[category],
       )}
     >
-      {dotCategory && (
-        <span
-          className={clsx("h-1.5 w-1.5 rounded-full", dotStyles[dotCategory])}
-        />
-      )}
+      {dotCategory && <span className={clsx("h-1.5 w-1.5 rounded-full", dotStyles[dotCategory])} />}
       {status.replace("_", " ")}
     </span>
   );

@@ -21,19 +21,21 @@ export function CodeBlock({ code, language, className, showCopy = true }: Props)
   return (
     <div className={clsx("group relative", className)}>
       {language && (
-        <div className="absolute top-2.5 left-3 text-[10px] font-mono uppercase tracking-wider text-fg-subtle">
+        <div className="text-fg-subtle absolute top-2.5 left-3 font-mono text-[10px] tracking-wider uppercase">
           {language}
         </div>
       )}
       {showCopy && (
         <button
-          onClick={handleCopy}
-          className="absolute top-2 right-2 rounded-md border border-border-strong bg-surface-100 p-1.5 text-fg-muted opacity-0 transition-all hover:border-border-hover hover:text-fg-secondary group-hover:opacity-100"
+          onClick={() => {
+            void handleCopy();
+          }}
+          className="border-border-strong bg-surface-100 text-fg-muted hover:border-border-hover hover:text-fg-secondary absolute top-2 right-2 rounded-md border p-1.5 opacity-0 transition-all group-hover:opacity-100"
         >
           {copied ? <Check size={14} /> : <Copy size={14} />}
         </button>
       )}
-      <pre className="code-block overflow-x-auto p-4 pt-8 text-fg-tertiary">
+      <pre className="code-block text-fg-tertiary overflow-x-auto p-4 pt-8">
         <code>{code}</code>
       </pre>
     </div>

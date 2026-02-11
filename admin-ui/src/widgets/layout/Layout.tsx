@@ -4,7 +4,7 @@ import { Header } from "./Header";
 
 export function Layout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex h-screen overflow-hidden bg-surface-0">
+    <div className="bg-surface-0 flex h-screen overflow-hidden">
       <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header />

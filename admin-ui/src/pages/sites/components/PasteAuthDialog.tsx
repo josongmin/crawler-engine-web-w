@@ -29,8 +29,7 @@ const modes: {
     label: "Cookie String",
     icon: Cookie,
     hint: "Paste from DevTools → Network tab → Request Headers → Cookie value. Supports both 'key=value; key2=value2' format and line-separated 'key=value' pairs.",
-    placeholder:
-      "PHPSESSID=abc123def456; tn_user=xyz789; remember_me=token_here",
+    placeholder: "PHPSESSID=abc123def456; tn_user=xyz789; remember_me=token_here",
   },
   {
     id: "headers",
@@ -69,12 +68,7 @@ const modes: {
 
 // ── Component ──────────────────────────────────────────
 
-export function PasteAuthDialog({
-  open,
-  onClose,
-  siteName,
-  onSubmit,
-}: Props) {
+export function PasteAuthDialog({ open, onClose, siteName, onSubmit }: Props) {
   const [mode, setMode] = useState<PasteMode>("cookies");
   const [content, setContent] = useState("");
 
@@ -94,13 +88,9 @@ export function PasteAuthDialog({
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      title={`Paste Authentication — ${siteName}`}
-    >
+    <Dialog open={open} onClose={handleClose} title={`Paste Authentication — ${siteName}`}>
       {/* Mode selector */}
-      <div className="mb-4 flex gap-0.5 rounded-lg border border-border bg-surface-0 p-0.5">
+      <div className="border-border bg-surface-0 mb-4 flex gap-0.5 rounded-lg border p-0.5">
         {modes.map((m) => (
           <button
             key={m.id}
@@ -119,9 +109,7 @@ export function PasteAuthDialog({
       </div>
 
       {/* Hint */}
-      <p className="mb-3 text-xs leading-relaxed text-fg-subtle">
-        {current.hint}
-      </p>
+      <p className="text-fg-subtle mb-3 text-xs leading-relaxed">{current.hint}</p>
 
       {/* Textarea */}
       <textarea
@@ -129,14 +117,14 @@ export function PasteAuthDialog({
         onChange={(e) => setContent(e.target.value)}
         placeholder={current.placeholder}
         rows={8}
-        className="w-full rounded-lg border border-border bg-surface-0 p-3 font-mono text-xs leading-relaxed text-fg-tertiary placeholder:text-fg-faint focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500/30"
+        className="border-border bg-surface-0 text-fg-tertiary placeholder:text-fg-faint focus:border-accent-500 focus:ring-accent-500/30 w-full rounded-lg border p-3 font-mono text-xs leading-relaxed focus:ring-1 focus:outline-none"
         spellCheck={false}
         autoFocus
       />
 
       {/* Actions */}
       <div className="mt-4 flex items-center justify-between">
-        <p className="text-[11px] text-fg-faint">
+        <p className="text-fg-faint text-[11px]">
           {content.trim().length > 0
             ? `${content.trim().length} characters`
             : "Paste your auth data above"}

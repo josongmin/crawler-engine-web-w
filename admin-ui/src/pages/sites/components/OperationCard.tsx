@@ -2,14 +2,7 @@ import { useState } from "react";
 import { Card } from "@/shared/ui/Card";
 import { Button } from "@/shared/ui/Button";
 import { StatusBadge } from "@/shared/ui/StatusBadge";
-import {
-  Play,
-  Search,
-  FileText,
-  MessageSquare,
-  List,
-  Link2,
-} from "lucide-react";
+import { Play, Search, FileText, MessageSquare, List, Link2 } from "lucide-react";
 import { clsx } from "clsx";
 import type { SiteOperation, OperationType } from "@/shared/config/sites";
 import type { LucideIcon } from "lucide-react";
@@ -49,12 +42,7 @@ interface Props {
 
 // ── Component ──────────────────────────────────────────
 
-export function OperationCard({
-  operation,
-  lastJob,
-  disabled,
-  onRun,
-}: Props) {
+export function OperationCard({ operation, lastJob, disabled, onRun }: Props) {
   const [limit, setLimit] = useState(operation.defaultLimit);
 
   const Icon = typeIcons[operation.type];
@@ -65,7 +53,7 @@ export function OperationCard({
       hover={!disabled}
       className={clsx(
         "flex flex-col justify-between",
-        disabled && "opacity-50 pointer-events-none",
+        disabled && "pointer-events-none opacity-50",
       )}
     >
       {/* ── Header ─────────────────────────────────── */}
@@ -75,39 +63,31 @@ export function OperationCard({
             <Icon size={18} strokeWidth={1.6} />
           </div>
           {operation.ruleId && (
-            <span className="flex items-center gap-1 rounded-md bg-surface-200 px-1.5 py-0.5 text-[10px] font-medium text-fg-subtle">
+            <span className="bg-surface-200 text-fg-subtle flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-medium">
               <Link2 size={10} />
               rule linked
             </span>
           )}
         </div>
-        <h3 className="mt-3 text-sm font-semibold text-fg">
-          {operation.name}
-        </h3>
-        <p className="mt-1 text-xs leading-relaxed text-fg-subtle">
-          {operation.description}
-        </p>
+        <h3 className="text-fg mt-3 text-sm font-semibold">{operation.name}</h3>
+        <p className="text-fg-subtle mt-1 text-xs leading-relaxed">{operation.description}</p>
       </div>
 
       {/* ── Last Job ───────────────────────────────── */}
       {lastJob && (
-        <div className="mt-3 flex items-center gap-2 rounded-lg bg-surface-0 px-2.5 py-2">
+        <div className="bg-surface-0 mt-3 flex items-center gap-2 rounded-lg px-2.5 py-2">
           <StatusBadge status={lastJob.status} />
           {lastJob.items > 0 && (
-            <span className="font-mono text-[11px] text-fg-muted">
-              {lastJob.items} items
-            </span>
+            <span className="text-fg-muted font-mono text-[11px]">{lastJob.items} items</span>
           )}
-          <span className="ml-auto text-[11px] text-fg-faint">
-            {lastJob.ago}
-          </span>
+          <span className="text-fg-faint ml-auto text-[11px]">{lastJob.ago}</span>
         </div>
       )}
 
       {/* ── Actions ────────────────────────────────── */}
-      <div className="mt-4 flex items-center gap-2 border-t border-border/50 pt-3">
+      <div className="border-border/50 mt-4 flex items-center gap-2 border-t pt-3">
         <div className="flex items-center gap-1.5">
-          <label className="text-[10px] font-semibold uppercase tracking-widest text-fg-faint">
+          <label className="text-fg-faint text-[10px] font-semibold tracking-widest uppercase">
             Limit
           </label>
           <input
@@ -116,7 +96,7 @@ export function OperationCard({
             onChange={(e) => setLimit(Number(e.target.value))}
             min={1}
             max={10000}
-            className="h-7 w-16 rounded-md border border-border bg-surface-0 px-2 text-center font-mono text-xs text-fg-tertiary focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500/30"
+            className="border-border bg-surface-0 text-fg-tertiary focus:border-accent-500 focus:ring-accent-500/30 h-7 w-16 rounded-md border px-2 text-center font-mono text-xs focus:ring-1 focus:outline-none"
           />
         </div>
         <Button

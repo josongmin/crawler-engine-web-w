@@ -1,0 +1,17 @@
+---
+description: Project-wide workflow and quality rules
+globs:
+  - "**/*"
+---
+
+## Working agreements
+
+- Prefer `just` targets when available (`just check`, `just format`, `just dev`).
+- Keep changes aligned with the layered Python architecture enforced by `import-linter`.
+- For frontend changes, keep reusable pieces in `admin-ui/src/shared/**` and route screens in `admin-ui/src/pages/**`.
+
+## Before finishing a change
+
+- Backend: run `python -m ruff format .` and `python -m ruff check .`
+- Frontend: run `npm run format` and `npm run lint`
+

@@ -1,13 +1,7 @@
 import { Link } from "react-router-dom";
 import { Card } from "@/shared/ui/Card";
 import { StatusBadge } from "@/shared/ui/StatusBadge";
-import {
-  Globe,
-  Play,
-  Database,
-  ArrowRight,
-  ExternalLink,
-} from "lucide-react";
+import { Globe, Play, Database, ArrowRight, ExternalLink } from "lucide-react";
 import { clsx } from "clsx";
 import { SITES } from "@/shared/config/sites";
 
@@ -140,17 +134,13 @@ export function OverviewPage() {
           <Card key={s.label} hover>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-fg-subtle">{s.label}</p>
+                <p className="text-fg-subtle text-xs font-medium">{s.label}</p>
                 <div className="mt-1 flex items-baseline gap-1.5">
-                  <p className="text-2xl font-bold text-fg">{s.value}</p>
-                  {s.sub && (
-                    <span className="text-xs text-fg-faint">{s.sub}</span>
-                  )}
+                  <p className="text-fg text-2xl font-bold">{s.value}</p>
+                  {s.sub && <span className="text-fg-faint text-xs">{s.sub}</span>}
                 </div>
               </div>
-              <div
-                className={`rounded-lg bg-surface-100 p-2.5 ${s.color}`}
-              >
+              <div className={`bg-surface-100 rounded-lg p-2.5 ${s.color}`}>
                 <s.icon size={20} strokeWidth={1.6} />
               </div>
             </div>
@@ -160,7 +150,7 @@ export function OverviewPage() {
 
       {/* ── Site Cards ──────────────────────────────── */}
       <div>
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-fg-subtle">
+        <h2 className="text-fg-subtle mb-3 text-xs font-semibold tracking-widest uppercase">
           Sites
         </h2>
         <div className="grid grid-cols-3 gap-4">
@@ -172,27 +162,21 @@ export function OverviewPage() {
 
             return (
               <Link key={site.id} to={`/sites/${site.id}`}>
-                <Card
-                  hover
-                  className="group transition-all hover:border-accent-500/30"
-                >
+                <Card hover className="group hover:border-accent-500/30 transition-all">
                   {/* Header row */}
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <div
                         className={clsx(
                           "flex h-9 w-9 items-center justify-center rounded-lg text-xs font-bold",
-                          siteBgMap[site.themeColor] ??
-                            "bg-accent-500/20 text-accent-fg",
+                          siteBgMap[site.themeColor] ?? "bg-accent-500/20 text-accent-fg",
                         )}
                       >
                         {site.name[0]}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold text-fg">
-                            {site.name}
-                          </span>
+                          <span className="text-fg text-sm font-semibold">{site.name}</span>
                           <span
                             className={clsx(
                               "h-2 w-2 rounded-full",
@@ -200,14 +184,12 @@ export function OverviewPage() {
                             )}
                           />
                         </div>
-                        <span className="text-[11px] text-fg-subtle">
-                          {site.domain}
-                        </span>
+                        <span className="text-fg-subtle text-[11px]">{site.domain}</span>
                       </div>
                     </div>
                     <ArrowRight
                       size={14}
-                      className="mt-1 text-fg-faint transition-transform group-hover:translate-x-0.5 group-hover:text-accent-fg"
+                      className="text-fg-faint group-hover:text-accent-fg mt-1 transition-transform group-hover:translate-x-0.5"
                     />
                   </div>
 
@@ -216,37 +198,29 @@ export function OverviewPage() {
                     <div className="flex items-center justify-between">
                       <StatusBadge status={info.sessionStatus} />
                       {info.ttl && (
-                        <span className="text-[11px] text-fg-subtle">
-                          TTL {info.ttl}
-                        </span>
+                        <span className="text-fg-subtle text-[11px]">TTL {info.ttl}</span>
                       )}
                     </div>
 
                     {/* Last job */}
                     {info.lastJob ? (
-                      <div className="flex items-center gap-2 rounded-md bg-surface-0 px-2.5 py-1.5 text-[11px]">
-                        <span className="font-mono text-fg-subtle">
-                          {info.lastJob.id}
-                        </span>
-                        <span className="rounded bg-surface-200 px-1 py-0.5 font-mono text-[10px] text-fg-subtle">
+                      <div className="bg-surface-0 flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[11px]">
+                        <span className="text-fg-subtle font-mono">{info.lastJob.id}</span>
+                        <span className="bg-surface-200 text-fg-subtle rounded px-1 py-0.5 font-mono text-[10px]">
                           {info.lastJob.operation}
                         </span>
-                        <span className="ml-auto text-fg-faint">
-                          {info.lastJob.ago}
-                        </span>
+                        <span className="text-fg-faint ml-auto">{info.lastJob.ago}</span>
                         <StatusBadge status={info.lastJob.status} />
                       </div>
                     ) : (
-                      <p className="text-[11px] text-fg-faint">
-                        No recent jobs — click to set up
-                      </p>
+                      <p className="text-fg-faint text-[11px]">No recent jobs — click to set up</p>
                     )}
                   </div>
 
                   {/* Footer */}
-                  <div className="mt-3 flex items-center justify-between border-t border-border/50 pt-2.5 text-[11px] text-fg-faint">
+                  <div className="border-border/50 text-fg-faint mt-3 flex items-center justify-between border-t pt-2.5 text-[11px]">
                     <span>{info.operations} operations</span>
-                    <span className="flex items-center gap-1 text-fg-subtle group-hover:text-accent-fg">
+                    <span className="text-fg-subtle group-hover:text-accent-fg flex items-center gap-1">
                       Open hub
                       <ExternalLink size={10} />
                     </span>
@@ -260,32 +234,26 @@ export function OverviewPage() {
 
       {/* ── Recent Activity (Global) ────────────────── */}
       <Card>
-        <h3 className="mb-4 text-sm font-semibold text-fg-tertiary">
-          Recent Activity
-        </h3>
+        <h3 className="text-fg-tertiary mb-4 text-sm font-semibold">Recent Activity</h3>
         <div className="space-y-2">
           {recentActivity.map((j) => (
             <div
               key={j.id + j.site}
-              className="flex items-center justify-between rounded-lg bg-surface-0 px-3 py-2.5"
+              className="bg-surface-0 flex items-center justify-between rounded-lg px-3 py-2.5"
             >
               <div className="flex items-center gap-3">
-                <span className="font-mono text-xs text-fg-subtle">{j.id}</span>
-                <span className="text-sm font-medium text-fg-secondary">
-                  {j.site}
-                </span>
-                <span className="rounded bg-surface-200 px-1.5 py-0.5 font-mono text-[10px] text-fg-muted">
+                <span className="text-fg-subtle font-mono text-xs">{j.id}</span>
+                <span className="text-fg-secondary text-sm font-medium">{j.site}</span>
+                <span className="bg-surface-200 text-fg-muted rounded px-1.5 py-0.5 font-mono text-[10px]">
                   {j.operation}
                 </span>
               </div>
               <div className="flex items-center gap-3">
                 {j.items > 0 && (
-                  <span className="font-mono text-xs text-fg-subtle">
-                    {j.items} items
-                  </span>
+                  <span className="text-fg-subtle font-mono text-xs">{j.items} items</span>
                 )}
                 <StatusBadge status={j.status} />
-                <span className="text-xs text-fg-faint">{j.ago}</span>
+                <span className="text-fg-faint text-xs">{j.ago}</span>
               </div>
             </div>
           ))}

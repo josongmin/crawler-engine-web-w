@@ -29,7 +29,7 @@ class ExampleCrawler(SiteCrawler):
         try:
             url = "https://example.com/"
             logger.info("Navigating to %s", url)
-            await page.goto(url, wait_until="domcontentloaded")
+            _ = await page.goto(url, wait_until="domcontentloaded")
 
             title = await page.title()
             h1 = await page.locator("h1").first.text_content()

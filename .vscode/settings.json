@@ -1,0 +1,56 @@
+{
+  "files.exclude": {
+    // Python cache & build artifacts
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/*.pyo": true,
+    "**/*.pyd": true,
+    "**/*.egg-info": true,
+    "**/.pytest_cache": true,
+    "**/.mypy_cache": true,
+    "**/.ruff_cache": true,
+    "**/.venv": true,
+    "**/dist": true,
+    "**/build": true,
+
+    // Playwright cache
+    "**/playwright/.cache": true,
+
+    // Node modules (already hidden by default, but explicit)
+    "**/node_modules": true,
+
+    // Crawler artifacts
+    "**/data": true,
+    "**/downloads": true,
+    "**/traces": true,
+    "**/screenshots": true,
+    "**/storage_state": true,
+    "**/logs": true,
+
+    // Database files
+    "**/*.db": true,
+    "**/*.db-journal": true,
+    "**/*.db-wal": true,
+    "**/*.db-shm": true,
+
+    // OS files
+    "**/.DS_Store": true
+  },
+
+  "search.exclude": {
+    "**/__pycache__": true,
+    "**/.pytest_cache": true,
+    "**/.mypy_cache": true,
+    "**/.ruff_cache": true,
+    "**/.venv": true,
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true
+  },
+
+  // 파일 변경 확인 비활성화
+  "files.confirmDelete": false,
+  "files.confirmSave": false,
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000
+}

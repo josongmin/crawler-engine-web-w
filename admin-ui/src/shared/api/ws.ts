@@ -1,9 +1,45 @@
 type WsHandler = (data: WsMessage) => void;
 
 export interface WsMessage {
-  type: "log" | "status" | "progress" | "complete" | "error";
+  type:
+    | "log"
+    | "status"
+    | "progress"
+    | "complete"
+    | "error"
+    | "node_status"
+    | "node_log"
+    | "node_states"
+    | "run_started"
+    | "run_completed"
+    | "run_error";
   timestamp: string;
   data: Record<string, unknown>;
+}
+
+function isRecord(v: unknown): v is Record<string, unknown> {
+  return typeof v === "object" && v !== null;
+}
+
+function isWsMessage(v: unknown): v is WsMessage {
+  if (!isRecord(v)) return false;
+  const type = v.type;
+  const timestamp = v.timestamp;
+  const data = v.data;
+  const validTypes = [
+    "log",
+    "status",
+    "progress",
+    "complete",
+    "error",
+    "node_status",
+    "node_log",
+    "node_states",
+    "run_started",
+    "run_completed",
+    "run_error",
+  ];
+  return typeof type === "string" && validTypes.includes(type) && typeof timestamp === "string" && isRecord(data);
 }
 
 /**
@@ -26,8 +62,11 @@ export function createWs(path: string, onMessage: WsHandler) {
 
     ws.onmessage = (e) => {
       try {
-        const msg: WsMessage = JSON.parse(e.data);
-        onMessage(msg);
+        if (typeof e.data !== "string") return;
+        const parsed = JSON.parse(e.data) as unknown;
+        if (isWsMessage(parsed)) {
+          onMessage(parsed);
+        }
       } catch {
         /* ignore malformed messages */
       }

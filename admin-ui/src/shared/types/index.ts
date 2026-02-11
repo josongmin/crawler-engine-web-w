@@ -169,3 +169,98 @@ export interface RuleTestResult {
   errors: string[];
   duration_ms: number;
 }
+
+/* ── Action Catalog Types ────────────────────────── */
+
+export type { ActionCategory, ResourceType, NodeStatus, WorkflowStatus, RunStatus, LintSeverity } from "@/shared/config/enums";
+
+export interface ActionConfigField {
+  key: string;
+  label: string;
+  type: "text" | "number" | "boolean" | "select" | "json" | "site_select" | "rule_select";
+  options?: { value: string; label: string }[];
+  default: unknown;
+  placeholder?: string;
+}
+
+export interface ActionDef {
+  action_id: string;
+  site: string;
+  category: string;
+  name: string;
+  description: string;
+  requires: string[];
+  provides: string[];
+  inputs_schema: ActionConfigField[];
+  outputs_schema: string[];
+  branches: string[] | null;
+  failure_modes: string[] | null;
+  has_error_output: boolean;
+}
+
+/* ── Workflow Types ──────────────────────────────── */
+
+export interface Workflow {
+  id: string;
+  name: string;
+  site: string;
+  description?: string;
+  status: string;
+  graph_json: string;
+  compiled_json?: string;
+  version: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WorkflowRun {
+  id: string;
+  workflow_id: string;
+  status: string;
+  node_states_json?: string;
+  started_at?: string;
+  finished_at?: string;
+  duration_ms?: number;
+  error?: string;
+  created_at: string;
+}
+
+export interface WorkflowNodeLog {
+  id: number;
+  run_id: string;
+  node_id: string;
+  level: string;
+  message: string;
+  timestamp: string;
+  data_json?: string;
+}
+
+/* ── Lint / Compile Types ────────────────────────── */
+
+export interface LintDiagnostic {
+  node_id: string | null;
+  severity: string;
+  code: string;
+  message: string;
+}
+
+export interface LintResult {
+  valid: boolean;
+  diagnostics: LintDiagnostic[];
+}
+
+export interface CompiledNode {
+  node_id: string;
+  action_id: string;
+  config: Record<string, unknown>;
+  depends_on: string[];
+  auto_inserted: boolean;
+}
+
+export interface CompileResult {
+  valid: boolean;
+  execution_order: string[];
+  nodes: CompiledNode[];
+  diagnostics: LintDiagnostic[];
+  auto_inserted_nodes: string[];
+}

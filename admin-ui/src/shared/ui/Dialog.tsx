@@ -48,7 +48,7 @@ export function Dialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-overlay backdrop-blur-[2px]"
+        className="bg-overlay absolute inset-0 backdrop-blur-[2px]"
         onClick={onClose}
         aria-hidden
       />
@@ -57,17 +57,17 @@ export function Dialog({
         role="dialog"
         aria-modal
         className={clsx(
-          "relative w-full rounded-xl border border-border bg-surface-50 shadow-2xl",
+          "border-border bg-surface-50 relative w-full rounded-xl border shadow-2xl",
           maxWidth,
           className,
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <h2 className="text-base font-semibold text-fg">{title}</h2>
+        <div className="border-border flex items-center justify-between border-b px-5 py-4">
+          <h2 className="text-fg text-base font-semibold">{title}</h2>
           <button
             onClick={onClose}
-            className="rounded-md p-1.5 text-fg-subtle transition-colors hover:bg-surface-100 hover:text-fg-tertiary"
+            className="text-fg-subtle hover:bg-surface-100 hover:text-fg-tertiary rounded-md p-1.5 transition-colors"
           >
             <X size={16} />
           </button>

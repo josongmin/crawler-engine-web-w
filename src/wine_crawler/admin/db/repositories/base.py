@@ -1,3 +1,6 @@
+# pyright: reportUnnecessaryTypeIgnoreComment=false
+# Cursor.rowcount exists but type stubs don't include it
+
 """Base repository with common CRUD helpers.
 
 Subclasses define ``_table``, ``_pk``, ``_model`` and get typed CRUD for free.
@@ -24,12 +27,16 @@ class BaseRepository(Generic[T]):
         _model  - Pydantic model class for row -> model conversion
     """
 
-    _table: str
+    _table: str = ""
     _pk: str = "id"
-    _model: type[T]
+    _model: type[T]  # pyright: ignore[reportUninitializedInstanceVariable]
 
     def __init__(self, db: Database) -> None:
+        # BaseRepository doesn't inherit from any class, so no super() call needed
         self._db = db
+        # Subclasses must set _table and _model
+        if not self._table:
+            raise RuntimeError(f"{self.__class__.__name__} must set _table class variable")
 
     # ------------------------------------------------------------------
     # Read
@@ -76,7 +83,7 @@ class BaseRepository(Generic[T]):
         if not filters:
             return await self.list_all(order_by=order_by, limit=limit, offset=offset)
 
-        clauses = []
+        clauses: list[str] = []
         values: list[Any] = []
         for col, val in filters.items():
             if val is None:
@@ -100,7 +107,7 @@ class BaseRepository(Generic[T]):
             val = await self._db.fetch_val(f"SELECT COUNT(*) FROM {self._table}")
             return val or 0
 
-        clauses = []
+        clauses: list[str] = []
         values: list[Any] = []
         for col, val in filters.items():
             if val is None:
@@ -130,7 +137,7 @@ class BaseRepository(Generic[T]):
         cols = list(data.keys())
         placeholders = ", ".join("?" for _ in cols)
         col_names = ", ".join(cols)
-        await self._db.execute(
+        _ = await self._db.execute(
             f"INSERT INTO {self._table} ({col_names}) VALUES ({placeholders})",
             list(data.values()),
         )
@@ -148,7 +155,8 @@ class BaseRepository(Generic[T]):
             f"UPDATE {self._table} SET {set_clause} WHERE {self._pk} = ?",
             values,
         )
-        return cursor.rowcount > 0  # type: ignore[union-attr]
+        # Cursor.rowcount exists but type checker doesn't recognize it
+        return cursor.rowcount > 0  # type: ignore[attr-defined]
 
     async def delete(self, pk: Any) -> bool:
         """Delete a row by primary key. Returns True if a row was removed."""
@@ -156,14 +164,15 @@ class BaseRepository(Generic[T]):
             f"DELETE FROM {self._table} WHERE {self._pk} = ?",
             [pk],
         )
-        return cursor.rowcount > 0  # type: ignore[union-attr]
+        # Cursor.rowcount exists but type checker doesn't recognize it
+        return cursor.rowcount > 0  # type: ignore[attr-defined]
 
     async def upsert(self, data: dict[str, Any]) -> None:
         """Insert or replace a row (uses SQLite REPLACE)."""
         cols = list(data.keys())
         placeholders = ", ".join("?" for _ in cols)
         col_names = ", ".join(cols)
-        await self._db.execute(
+        _ = await self._db.execute(
             f"INSERT OR REPLACE INTO {self._table} ({col_names}) VALUES ({placeholders})",
             list(data.values()),
         )

@@ -26,8 +26,10 @@ import {
   GitBranch,
   Save,
   Bell,
+  Power,
   type LucideIcon,
 } from "lucide-react";
+import type { ActionDef } from "@/shared/types";
 
 // ── Core types ─────────────────────────────────────────
 
@@ -436,16 +438,85 @@ export function getNodeDef(type: string): NodeTypeDef | undefined {
   return NODE_DEFS.find((d) => d.type === type);
 }
 
-export function getNodesByCategory(
-  category: NodeCategory,
-): NodeTypeDef[] {
+export function getNodesByCategory(category: NodeCategory): NodeTypeDef[] {
   return NODE_DEFS.filter((d) => d.category === category);
 }
 
 export function getDefaultConfig(type: string): Record<string, unknown> {
   const def = getNodeDef(type);
   if (!def) return {};
-  return Object.fromEntries(
-    def.configFields.map((f) => [f.key, f.default]),
-  );
+  return Object.fromEntries(def.configFields.map((f) => [f.key, f.default]));
+}
+
+// ── Icon mapping (action nodeType → Lucide icon) ────────
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  login: LogIn,
+  logout: LogOut,
+  "auto-logout": Power,
+  "paste-auth": ClipboardPaste,
+  "refresh-session": RefreshCw,
+  "check-session": ShieldCheck,
+  search: Search,
+  detail: FileText,
+  review: MessageSquare,
+  list: List,
+  "export-curl": Terminal,
+  "export-httpx": Send,
+  "export-storage": FileJson,
+  delay: Timer,
+  condition: GitBranch,
+  "save-file": Save,
+  notify: Bell,
+};
+
+const CATEGORY_COLORS: Record<string, string> = {
+  auth: "bg-status-success-muted text-status-success",
+  crawl: "bg-status-info-muted text-status-info",
+  export: "bg-status-warning-muted text-status-warning",
+  control: "bg-status-neutral-muted text-status-neutral",
+  data: "bg-violet-500/15 text-violet-500 dark:text-violet-400",
+};
+
+/**
+ * Build `NodeTypeDef[]` from the API catalog response.
+ * Falls back to static `NODE_DEFS` for actions without a catalog entry.
+ */
+export function buildNodeDefsFromCatalog(catalog: ActionDef[]): NodeTypeDef[] {
+  const seen = new Set<string>();
+  const result: NodeTypeDef[] = [];
+
+  for (const action of catalog) {
+    // Extract short type from action_id: "*.login" → "login", "burghound.auto-logout" → "auto-logout"
+    const shortType = action.action_id.split(".").slice(1).join(".");
+    if (seen.has(shortType)) continue;
+    seen.add(shortType);
+
+    const icon = ICON_MAP[shortType] ?? GitBranch;
+    const colorClass = CATEGORY_COLORS[action.category] ?? CATEGORY_COLORS.control;
+
+    const configFields: ConfigField[] = action.inputs_schema.map((f) => ({
+      key: f.key,
+      label: f.label,
+      type: f.type as ConfigField["type"],
+      options: f.options?.map((o) => ({ value: o.value ?? "", label: o.label ?? "" })),
+      default: f.default ?? "",
+      placeholder: f.placeholder,
+    }));
+
+    result.push({
+      type: shortType,
+      category: action.category as NodeCategory,
+      name: action.name,
+      description: action.description,
+      icon,
+      colorClass,
+      hasInput: true,
+      hasOutput: action.has_error_output || action.provides.length > 0 || true,
+      hasErrorOutput: action.has_error_output,
+      configFields,
+    });
+  }
+
+  return result;
 }

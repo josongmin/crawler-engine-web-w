@@ -212,8 +212,69 @@ CREATE INDEX idx_schedules_enabled    ON schedules(enabled);
 
 Migration = tuple[int, str, str]
 
+_V2_SQL = """\
+-- =============================================
+-- Workflows
+-- =============================================
+
+CREATE TABLE workflows (
+    id              TEXT PRIMARY KEY,
+    name            TEXT NOT NULL,
+    site            TEXT NOT NULL,
+    description     TEXT,
+    status          TEXT NOT NULL DEFAULT 'draft',
+    graph_json      TEXT NOT NULL,
+    compiled_json   TEXT,
+    version         INTEGER NOT NULL DEFAULT 1,
+    created_at      TEXT NOT NULL,
+    updated_at      TEXT NOT NULL
+);
+
+CREATE INDEX idx_workflows_site   ON workflows(site);
+CREATE INDEX idx_workflows_status ON workflows(status);
+
+-- =============================================
+-- Workflow Runs
+-- =============================================
+
+CREATE TABLE workflow_runs (
+    id               TEXT PRIMARY KEY,
+    workflow_id      TEXT NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
+    status           TEXT NOT NULL DEFAULT 'pending',
+    node_states_json TEXT,
+    started_at       TEXT,
+    finished_at      TEXT,
+    duration_ms      INTEGER,
+    error            TEXT,
+    created_at       TEXT NOT NULL
+);
+
+CREATE INDEX idx_workflow_runs_workflow_id ON workflow_runs(workflow_id);
+CREATE INDEX idx_workflow_runs_status      ON workflow_runs(status);
+CREATE INDEX idx_workflow_runs_created_at  ON workflow_runs(created_at);
+
+-- =============================================
+-- Workflow Node Logs
+-- =============================================
+
+CREATE TABLE workflow_node_logs (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id      TEXT NOT NULL REFERENCES workflow_runs(id) ON DELETE CASCADE,
+    node_id     TEXT NOT NULL,
+    level       TEXT NOT NULL,
+    message     TEXT NOT NULL,
+    timestamp   TEXT NOT NULL,
+    data_json   TEXT
+);
+
+CREATE INDEX idx_wf_node_logs_run_id    ON workflow_node_logs(run_id);
+CREATE INDEX idx_wf_node_logs_node_id   ON workflow_node_logs(node_id);
+CREATE INDEX idx_wf_node_logs_timestamp ON workflow_node_logs(timestamp);
+"""
+
 MIGRATIONS: Sequence[Migration] = [
     (1, "initial schema", _V1_SQL),
+    (2, "workflow engine tables", _V2_SQL),
 ]
 
 
@@ -225,7 +286,7 @@ MIGRATIONS: Sequence[Migration] = [
 async def apply_migrations(db: Database) -> None:
     """Apply any pending migrations in order."""
     # Ensure the version table exists (idempotent)
-    await db.connection.execute(
+    _ = await db.connection.execute(
         """
         CREATE TABLE IF NOT EXISTS _schema_version (
             version     INTEGER PRIMARY KEY,
@@ -243,8 +304,8 @@ async def apply_migrations(db: Database) -> None:
         if version <= current:
             continue
         logger.info("Applying migration v%d: %s", version, description)
-        await db.connection.executescript(sql)
-        await db.connection.execute(
+        _ = await db.connection.executescript(sql)
+        _ = await db.connection.execute(
             "INSERT INTO _schema_version (version, description) VALUES (?, ?)",
             [version, description],
         )

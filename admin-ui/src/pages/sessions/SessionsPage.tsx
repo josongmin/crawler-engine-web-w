@@ -24,33 +24,33 @@ export function SessionsPage() {
           <div className="flex items-start justify-between">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <h2 className="text-lg font-semibold text-fg">{s.site}</h2>
+                <h2 className="text-fg text-lg font-semibold">{s.site}</h2>
                 <StatusBadge status={s.status} />
               </div>
 
               {/* TTL Bar */}
               <div className="w-80 space-y-1">
-                <div className="flex justify-between text-xs text-fg-subtle">
+                <div className="text-fg-subtle flex justify-between text-xs">
                   <span>TTL Remaining</span>
                   <span>{s.ttl_remaining}</span>
                 </div>
-                <div className="h-1.5 rounded-full bg-surface-200">
+                <div className="bg-surface-200 h-1.5 rounded-full">
                   <div
-                    className="h-full rounded-full bg-status-success/60 transition-all"
+                    className="bg-status-success/60 h-full rounded-full transition-all"
                     style={{ width: `${s.ttl_pct}%` }}
                   />
                 </div>
               </div>
 
               {/* Meta */}
-              <div className="flex gap-6 text-xs text-fg-subtle">
+              <div className="text-fg-subtle flex gap-6 text-xs">
                 <span>Uses: {s.use_count}</span>
                 <span>Last login: {s.last_login}</span>
                 <span>Clean close: {s.clean_close ? "yes" : "no"}</span>
               </div>
 
               {/* Persona */}
-              <div className="rounded-lg bg-surface-0 px-3 py-2 font-mono text-xs text-fg-muted">
+              <div className="bg-surface-0 text-fg-muted rounded-lg px-3 py-2 font-mono text-xs">
                 {s.user_agent}
               </div>
             </div>

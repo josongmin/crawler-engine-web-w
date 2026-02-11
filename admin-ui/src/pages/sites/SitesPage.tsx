@@ -4,15 +4,7 @@ import { Card } from "@/shared/ui/Card";
 import { Button } from "@/shared/ui/Button";
 import { StatusBadge } from "@/shared/ui/StatusBadge";
 import { CodeBlock } from "@/shared/ui/CodeBlock";
-import {
-  ExternalLink,
-  ShieldCheck,
-  Copy,
-  Check,
-  Send,
-  Terminal,
-  FileJson,
-} from "lucide-react";
+import { ExternalLink, ShieldCheck, Check, Send, Terminal, FileJson } from "lucide-react";
 import { clsx } from "clsx";
 import { SITES, getSiteById } from "@/shared/config/sites";
 import { SessionPanel, type SessionData } from "./components/SessionPanel";
@@ -180,7 +172,8 @@ export function SitesPage() {
 
   const handleRunOperation = (operationId: string, limit: number) => {
     // TODO: POST /api/jobs with { site, operation, limit }
-    console.log(`Run ${site.id}/${operationId} with limit=${limit}`);
+    void operationId;
+    void limit;
   };
 
   // ── Render ───────────────────────────────────────────
@@ -192,21 +185,20 @@ export function SitesPage() {
         <div className="flex items-center gap-3">
           <SiteLogo name={site.name} color={site.themeColor} />
           <div>
-            <h1 className="text-lg font-bold text-fg">{site.name}</h1>
+            <h1 className="text-fg text-lg font-bold">{site.name}</h1>
             <a
               href={site.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs text-fg-subtle transition-colors hover:text-accent-fg"
+              className="text-fg-subtle hover:text-accent-fg flex items-center gap-1 text-xs transition-colors"
             >
               {site.domain}
               <ExternalLink size={10} />
             </a>
           </div>
         </div>
-        <div className="text-xs text-fg-faint">
-          {site.operations.length} operations ·{" "}
-          {site.supportsRequestKit && "Kit export"}{" "}
+        <div className="text-fg-faint text-xs">
+          {site.operations.length} operations · {site.supportsRequestKit && "Kit export"}{" "}
           {site.supportsPasteAuth && "· Paste auth"}
         </div>
       </div>
@@ -235,7 +227,7 @@ export function SitesPage() {
         <SectionLabel>
           Operations
           {!isSessionActive && (
-            <span className="ml-2 text-[10px] font-normal text-fg-faint">
+            <span className="text-fg-faint ml-2 text-[10px] font-normal">
               Login required to run
             </span>
           )}
@@ -243,9 +235,7 @@ export function SitesPage() {
         <div
           className={clsx(
             "grid gap-4",
-            site.operations.length <= 2
-              ? "grid-cols-2"
-              : "grid-cols-2 lg:grid-cols-3",
+            site.operations.length <= 2 ? "grid-cols-2" : "grid-cols-2 lg:grid-cols-3",
           )}
         >
           {site.operations.map((op) => {
@@ -285,7 +275,9 @@ export function SitesPage() {
                 icon={<Terminal size={13} />}
                 copied={copiedFormat === "cURL"}
                 active={exportFormat === "cURL"}
-                onClick={() => handleExportClick("cURL")}
+                onClick={() => {
+                  void handleExportClick("cURL");
+                }}
                 disabled={!isSessionActive}
               />
               <ExportButton
@@ -293,7 +285,9 @@ export function SitesPage() {
                 icon={<Send size={13} />}
                 copied={copiedFormat === "httpx"}
                 active={exportFormat === "httpx"}
-                onClick={() => handleExportClick("httpx")}
+                onClick={() => {
+                  void handleExportClick("httpx");
+                }}
                 disabled={!isSessionActive}
               />
               <ExportButton
@@ -301,7 +295,9 @@ export function SitesPage() {
                 icon={<FileJson size={13} />}
                 copied={copiedFormat === "Storage State"}
                 active={exportFormat === "Storage State"}
-                onClick={() => handleExportClick("Storage State")}
+                onClick={() => {
+                  void handleExportClick("Storage State");
+                }}
                 disabled={!isSessionActive}
               />
             </div>
@@ -323,9 +319,7 @@ export function SitesPage() {
                   />
                   {isSessionActive ? "valid" : "expired"}
                 </span>
-                {isSessionActive && (
-                  <span className="text-fg-subtle">23h remaining</span>
-                )}
+                {isSessionActive && <span className="text-fg-subtle">23h remaining</span>}
                 <Button
                   size="sm"
                   variant="ghost"
@@ -354,7 +348,7 @@ export function SitesPage() {
           <SectionLabel>Recent Activity</SectionLabel>
           <Card>
             {jobs.length === 0 ? (
-              <p className="py-4 text-center text-xs text-fg-faint">
+              <p className="text-fg-faint py-4 text-center text-xs">
                 No recent activity for {site.name}
               </p>
             ) : (
@@ -362,30 +356,26 @@ export function SitesPage() {
                 {jobs.map((j) => (
                   <div
                     key={j.id}
-                    className="flex items-center justify-between rounded-lg bg-surface-0 px-3 py-2.5"
+                    className="bg-surface-0 flex items-center justify-between rounded-lg px-3 py-2.5"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-xs text-fg-subtle">
-                        {j.id}
-                      </span>
-                      <span className="rounded bg-surface-200 px-1.5 py-0.5 font-mono text-[10px] text-fg-muted">
+                      <span className="text-fg-subtle font-mono text-xs">{j.id}</span>
+                      <span className="bg-surface-200 text-fg-muted rounded px-1.5 py-0.5 font-mono text-[10px]">
                         {j.operation}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
                       {j.items > 0 && (
-                        <span className="font-mono text-xs text-fg-subtle">
-                          {j.items} items
-                        </span>
+                        <span className="text-fg-subtle font-mono text-xs">{j.items} items</span>
                       )}
                       <StatusBadge status={j.status} />
-                      <span className="text-xs text-fg-faint">{j.ago}</span>
+                      <span className="text-fg-faint text-xs">{j.ago}</span>
                     </div>
                   </div>
                 ))}
                 <Link
                   to={`/jobs?site=${site.id}`}
-                  className="mt-2 block text-center text-xs text-fg-subtle transition-colors hover:text-accent-fg"
+                  className="text-fg-subtle hover:text-accent-fg mt-2 block text-center text-xs transition-colors"
                 >
                   View all jobs for {site.name} →
                 </Link>
@@ -402,7 +392,8 @@ export function SitesPage() {
         siteName={site.name}
         onSubmit={(mode, content) => {
           // TODO: POST /api/sessions/{site}/paste-auth
-          console.log(`Paste auth for ${site.id}:`, mode, content);
+          void mode;
+          void content;
         }}
       />
     </div>
@@ -433,7 +424,7 @@ function SiteLogo({ name, color }: { name: string; color: string }) {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="mb-2.5 text-xs font-semibold uppercase tracking-widest text-fg-subtle">
+    <h2 className="text-fg-subtle mb-2.5 text-xs font-semibold tracking-widest uppercase">
       {children}
     </h2>
   );
@@ -466,15 +457,9 @@ function ExportButton({
           : "border-border bg-surface-0 text-fg-muted hover:border-border-hover hover:text-fg-secondary",
       )}
     >
-      {copied ? (
-        <Check size={13} className="text-status-success" />
-      ) : (
-        icon
-      )}
+      {copied ? <Check size={13} className="text-status-success" /> : icon}
       {label}
-      {copied && (
-        <span className="text-[10px] text-status-success">Copied!</span>
-      )}
+      {copied && <span className="text-status-success text-[10px]">Copied!</span>}
     </button>
   );
 }

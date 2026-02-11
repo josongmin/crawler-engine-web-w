@@ -1,29 +1,28 @@
 const BASE = "/api";
 
 export class ApiError extends Error {
-  constructor(
-    public status: number,
-    public body: unknown,
-  ) {
+  status: number;
+  body: unknown;
+
+  constructor(status: number, body: unknown) {
     super(`API ${status}`);
     this.name = "ApiError";
+    this.status = status;
+    this.body = body;
   }
 }
 
-async function request<T>(
-  path: string,
-  init?: RequestInit,
-): Promise<T> {
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     headers: { "Content-Type": "application/json", ...init?.headers },
     ...init,
   });
   if (!res.ok) {
-    const body = await res.json().catch(() => null);
+    const body = (await res.json().catch(() => null)) as unknown;
     throw new ApiError(res.status, body);
   }
   if (res.status === 204) return undefined as T;
-  return res.json();
+  return (await res.json()) as unknown as T;
 }
 
 export const api = {

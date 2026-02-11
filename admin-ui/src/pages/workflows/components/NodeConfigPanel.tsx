@@ -17,12 +17,7 @@ interface Props {
 
 // ── Component ──────────────────────────────────────────
 
-export function NodeConfigPanel({
-  node,
-  onConfigChange,
-  onDelete,
-  onDuplicate,
-}: Props) {
+export function NodeConfigPanel({ node, onConfigChange, onDelete, onDuplicate }: Props) {
   const data = node.data as {
     nodeType: string;
     label: string;
@@ -40,23 +35,19 @@ export function NodeConfigPanel({
   };
 
   return (
-    <div className="flex w-72 flex-col border-l border-border bg-surface-0 overflow-y-auto">
+    <div className="border-border bg-surface-0 flex w-72 flex-col overflow-y-auto border-l">
       {/* Header */}
-      <div className="border-b border-border px-4 py-3">
+      <div className="border-border border-b px-4 py-3">
         <div className="flex items-center gap-2.5">
           <div className={clsx("rounded-lg p-1.5", def.colorClass)}>
             <Icon size={14} strokeWidth={2} />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="truncate text-sm font-semibold text-fg-secondary">
-              {data.label}
-            </h3>
-            <p className="text-[10px] text-fg-subtle">{def.category}</p>
+            <h3 className="text-fg-secondary truncate text-sm font-semibold">{data.label}</h3>
+            <p className="text-fg-subtle text-[10px]">{def.category}</p>
           </div>
         </div>
-        <p className="mt-2 text-[11px] leading-relaxed text-fg-subtle">
-          {def.description}
-        </p>
+        <p className="text-fg-subtle mt-2 text-[11px] leading-relaxed">{def.description}</p>
       </div>
 
       {/* Config fields */}
@@ -86,14 +77,12 @@ export function NodeConfigPanel({
         ))}
 
         {def.configFields.length === 0 && (
-          <p className="text-xs text-fg-faint">
-            No configuration needed for this node.
-          </p>
+          <p className="text-fg-faint text-xs">No configuration needed for this node.</p>
         )}
       </div>
 
       {/* Actions */}
-      <div className="border-t border-border p-4">
+      <div className="border-border border-t p-4">
         <div className="flex gap-2">
           <Button
             size="sm"
@@ -131,34 +120,44 @@ function FieldRenderer({
   onChange: (v: unknown) => void;
 }) {
   switch (field.type) {
-    case "text":
+    case "text": {
+      const v =
+        typeof value === "string"
+          ? value
+          : typeof value === "number" || typeof value === "boolean"
+            ? String(value)
+            : value == null
+              ? ""
+              : (JSON.stringify(value) ?? "");
       return (
         <Input
           label={field.label}
-          value={String(value ?? "")}
+          value={v}
           onChange={(e) => onChange(e.target.value)}
           placeholder={field.placeholder}
           className="font-mono text-xs"
         />
       );
+    }
 
-    case "number":
+    case "number": {
+      const n = typeof value === "number" ? value : typeof value === "string" ? Number(value) : 0;
+      const safe = Number.isFinite(n) ? String(n) : "0";
       return (
         <Input
           label={field.label}
           type="number"
-          value={String(value ?? 0)}
+          value={safe}
           onChange={(e) => onChange(Number(e.target.value))}
           className="text-xs"
         />
       );
+    }
 
     case "boolean":
       return (
         <label className="flex items-center justify-between gap-3">
-          <span className="text-xs font-medium text-fg-muted">
-            {field.label}
-          </span>
+          <span className="text-fg-muted text-xs font-medium">{field.label}</span>
           <button
             type="button"
             role="switch"
@@ -179,16 +178,18 @@ function FieldRenderer({
         </label>
       );
 
-    case "select":
+    case "select": {
+      const v = typeof value === "string" || typeof value === "number" ? String(value) : "";
       return (
         <Select
           label={field.label}
           options={field.options ?? []}
-          value={String(value ?? "")}
+          value={v}
           onChange={(e) => onChange(e.target.value)}
           className="text-xs"
         />
       );
+    }
 
     default:
       return null;

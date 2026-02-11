@@ -74,21 +74,23 @@ const fields = [
 
 export function RuleEditorPage() {
   const [mode, setMode] = useState<"form" | "json">("form");
-  const [testUrl, setTestUrl] = useState("https://www.burghound.com/tnsearch/tasting_notes.php?search=romanee");
+  const [testUrl, setTestUrl] = useState(
+    "https://www.burghound.com/tnsearch/tasting_notes.php?search=romanee",
+  );
 
   return (
     <div className="mx-auto max-w-7xl space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-semibold text-fg">search-results</h2>
-          <span className="rounded bg-surface-200 px-1.5 py-0.5 font-mono text-[10px] text-fg-subtle">
+          <h2 className="text-fg text-lg font-semibold">search-results</h2>
+          <span className="bg-surface-200 text-fg-subtle rounded px-1.5 py-0.5 font-mono text-[10px]">
             v3
           </span>
           <StatusBadge status="active" />
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex rounded-lg border border-border bg-surface-50 p-0.5">
+          <div className="border-border bg-surface-50 flex rounded-lg border p-0.5">
             <button
               onClick={() => setMode("form")}
               className={clsx(
@@ -138,38 +140,31 @@ export function RuleEditorPage() {
           ) : (
             <>
               <Card>
-                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+                <h3 className="text-fg-subtle mb-3 text-xs font-semibold tracking-wider uppercase">
                   Container
                 </h3>
-                <Input
-                  defaultValue="table#results tbody tr"
-                  className="font-mono text-xs"
-                />
+                <Input defaultValue="table#results tbody tr" className="font-mono text-xs" />
               </Card>
 
               <Card>
-                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+                <h3 className="text-fg-subtle mb-3 text-xs font-semibold tracking-wider uppercase">
                   Fields
                 </h3>
                 <div className="space-y-2">
                   {fields.map((f) => (
                     <div
                       key={f.name}
-                      className="flex items-center justify-between rounded-lg bg-surface-0 px-3 py-2.5"
+                      className="bg-surface-0 flex items-center justify-between rounded-lg px-3 py-2.5"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="w-24 text-sm font-medium text-fg-secondary">
-                          {f.name}
-                        </span>
-                        <code className="text-xs text-fg-muted">{f.selector}</code>
+                        <span className="text-fg-secondary w-24 text-sm font-medium">{f.name}</span>
+                        <code className="text-fg-muted text-xs">{f.selector}</code>
                       </div>
                       <div className="flex items-center gap-2">
                         <span
                           className={clsx(
-                            "text-xs font-mono",
-                            f.matched === f.total
-                              ? "text-status-success"
-                              : "text-status-danger",
+                            "font-mono text-xs",
+                            f.matched === f.total ? "text-status-success" : "text-status-danger",
                           )}
                         >
                           {f.matched}/{f.total}
@@ -184,7 +179,7 @@ export function RuleEditorPage() {
               </Card>
 
               <Card>
-                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+                <h3 className="text-fg-subtle mb-3 text-xs font-semibold tracking-wider uppercase">
                   Pagination
                 </h3>
                 <div className="grid grid-cols-2 gap-3">
@@ -200,7 +195,7 @@ export function RuleEditorPage() {
               </Card>
 
               <Card>
-                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+                <h3 className="text-fg-subtle mb-3 text-xs font-semibold tracking-wider uppercase">
                   Throttle
                 </h3>
                 <div className="grid grid-cols-2 gap-3">
@@ -215,7 +210,7 @@ export function RuleEditorPage() {
         {/* Right: Live Preview */}
         <div className="space-y-4">
           <Card>
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+            <h3 className="text-fg-subtle mb-3 text-xs font-semibold tracking-wider uppercase">
               Test URL
             </h3>
             <div className="flex gap-2">
@@ -232,17 +227,17 @@ export function RuleEditorPage() {
 
           <Card>
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+              <h3 className="text-fg-subtle text-xs font-semibold tracking-wider uppercase">
                 Extracted Data
               </h3>
-              <span className="rounded bg-status-success-muted px-2 py-0.5 text-xs font-medium text-status-success">
+              <span className="bg-status-success-muted text-status-success rounded px-2 py-0.5 text-xs font-medium">
                 Matched: {mockExtracted.length} rows
               </span>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="border-b border-border text-fg-subtle">
+                  <tr className="border-border text-fg-subtle border-b">
                     <th className="py-2 pr-4 font-medium">producer</th>
                     <th className="py-2 pr-4 font-medium">wine</th>
                     <th className="py-2 pr-4 font-medium">vintage</th>
@@ -251,7 +246,7 @@ export function RuleEditorPage() {
                 </thead>
                 <tbody>
                   {mockExtracted.map((row, i) => (
-                    <tr key={i} className="border-b border-border/50 text-fg-tertiary">
+                    <tr key={i} className="border-border/50 text-fg-tertiary border-b">
                       <td className="py-2 pr-4">{row.producer}</td>
                       <td className="py-2 pr-4">{row.wine}</td>
                       <td className="py-2 pr-4 font-mono">{row.vintage}</td>
@@ -264,27 +259,24 @@ export function RuleEditorPage() {
           </Card>
 
           <Card>
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+            <h3 className="text-fg-subtle mb-3 text-xs font-semibold tracking-wider uppercase">
               Selector Validation
             </h3>
             <div className="space-y-1.5">
               {fields.map((f) => (
                 <div key={f.name} className="flex items-center justify-between text-xs">
                   <code className="text-fg-muted">{f.selector}</code>
-                  <span className="font-mono text-status-success">{f.matched} matched</span>
+                  <span className="text-status-success font-mono">{f.matched} matched</span>
                 </div>
               ))}
             </div>
           </Card>
 
           <Card>
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+            <h3 className="text-fg-subtle mb-3 text-xs font-semibold tracking-wider uppercase">
               Raw JSON
             </h3>
-            <CodeBlock
-              code={JSON.stringify(mockExtracted[0], null, 2)}
-              language="json"
-            />
+            <CodeBlock code={JSON.stringify(mockExtracted[0], null, 2)} language="json" />
           </Card>
         </div>
       </div>

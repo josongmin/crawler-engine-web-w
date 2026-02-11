@@ -58,7 +58,7 @@ class CrawlRulesRepository(BaseRepository[CrawlRule]):
 
         new_version = rule.version + 1
         now = utcnow()
-        await self.update(
+        _ = await self.update(
             rule_id,
             {
                 "version": new_version,

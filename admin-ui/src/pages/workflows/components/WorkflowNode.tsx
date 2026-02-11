@@ -41,9 +41,7 @@ const errorHandleBase =
 
 // ── Component ──────────────────────────────────────────
 
-export const WorkflowNode = memo(function WorkflowNode(
-  props: NodeProps,
-) {
+export const WorkflowNode = memo(function WorkflowNode(props: NodeProps) {
   const data = props.data as WorkflowNodeData;
   const selected = props.selected;
 
@@ -60,21 +58,13 @@ export const WorkflowNode = memo(function WorkflowNode(
   return (
     <>
       {/* Input handle */}
-      {def.hasInput && (
-        <Handle
-          type="target"
-          position={Position.Top}
-          className={handleBase}
-        />
-      )}
+      {def.hasInput && <Handle type="target" position={Position.Top} className={handleBase} />}
 
       {/* Node body */}
       <div
         className={clsx(
-          "w-[220px] rounded-xl border bg-surface-50 transition-all",
-          selected
-            ? "border-accent-500 ring-2 ring-accent-500/20"
-            : "border-border",
+          "bg-surface-50 w-[220px] rounded-xl border transition-all",
+          selected ? "border-accent-500 ring-accent-500/20 ring-2" : "border-border",
           statusBorder[data.status],
         )}
       >
@@ -83,56 +73,36 @@ export const WorkflowNode = memo(function WorkflowNode(
           <div className={clsx("rounded-lg p-1.5", def.colorClass)}>
             <Icon size={14} strokeWidth={2} />
           </div>
-          <span className="truncate text-xs font-semibold text-fg-secondary">
-            {data.label}
-          </span>
+          <span className="text-fg-secondary truncate text-xs font-semibold">{data.label}</span>
         </div>
 
         {/* Config summary */}
         {configEntries.length > 0 && (
-          <div className="border-t border-border/40 px-3 py-2 text-[10px] leading-4 text-fg-subtle">
+          <div className="border-border/40 text-fg-subtle border-t px-3 py-2 text-[10px] leading-4">
             {configEntries.slice(0, 3).map(([k, v]) => (
               <div key={k} className="flex justify-between gap-2">
                 <span className="text-fg-faint">{k}</span>
-                <span className="truncate text-fg-muted">
-                  {typeof v === "boolean"
-                    ? v
-                      ? "yes"
-                      : "no"
-                    : String(v)}
+                <span className="text-fg-muted truncate">
+                  {typeof v === "boolean" ? (v ? "yes" : "no") : String(v)}
                 </span>
               </div>
             ))}
             {configEntries.length > 3 && (
-              <span className="text-fg-faint">
-                +{configEntries.length - 3} more
-              </span>
+              <span className="text-fg-faint">+{configEntries.length - 3} more</span>
             )}
           </div>
         )}
 
         {/* Status bar */}
-        <div className="flex items-center gap-1.5 border-t border-border/40 px-3 py-1.5">
-          <span
-            className={clsx(
-              "h-1.5 w-1.5 rounded-full",
-              statusDot[data.status],
-            )}
-          />
-          <span className="text-[10px] font-medium text-fg-subtle">
-            {data.status}
-          </span>
+        <div className="border-border/40 flex items-center gap-1.5 border-t px-3 py-1.5">
+          <span className={clsx("h-1.5 w-1.5 rounded-full", statusDot[data.status])} />
+          <span className="text-fg-subtle text-[10px] font-medium">{data.status}</span>
         </div>
       </div>
 
       {/* Output handle */}
       {def.hasOutput && (
-        <Handle
-          type="source"
-          position={Position.Bottom}
-          id="output"
-          className={handleBase}
-        />
+        <Handle type="source" position={Position.Bottom} id="output" className={handleBase} />
       )}
 
       {/* Error output handle (right side) */}

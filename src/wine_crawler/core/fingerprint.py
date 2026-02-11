@@ -1,3 +1,8 @@
+# pyright: reportUnnecessaryTypeIgnoreComment=false
+# pyright: reportMissingTypeStubs=false
+# pyright: reportUnknownVariableType=false
+# browserforge library doesn't have complete type stubs, type ignores are necessary
+
 """Coherent browser persona generation and caching via browserforge.
 
 A "persona" is a consistent set of browser fingerprint attributes (user-agent,
@@ -31,8 +36,8 @@ class Persona:
     locale: str
     timezone_id: str
     platform: str
-    http_headers: dict[str, str] = field(default_factory=dict)
-    raw_fingerprint: dict[str, Any] = field(default_factory=dict, repr=False)
+    http_headers: dict[str, str] = field(default_factory=dict)  # pyright: ignore[reportUnknownVariableType]
+    raw_fingerprint: dict[str, Any] = field(default_factory=dict, repr=False)  # pyright: ignore[reportUnknownVariableType]
 
 
 def generate_persona(
@@ -46,11 +51,12 @@ def generate_persona(
     consistent -- e.g. a Chrome-on-macOS UA will have matching screen sizes and
     platform strings.  This avoids fingerprint mismatches that flag bots.
     """
-    fg = FingerprintGenerator(browser=browser, os=os)
-    fp = fg.generate()
+    # browserforge types are not fully typed
+    fg = FingerprintGenerator(browser=browser, os=os)  # type: ignore[reportUnknownVariableType]
+    fp = fg.generate()  # type: ignore[reportUnknownVariableType]
 
-    hg = HeaderGenerator(browser=browser, os=os)
-    headers = hg.generate()
+    hg = HeaderGenerator(browser=browser, os=os)  # type: ignore[reportUnknownVariableType]
+    headers = hg.generate()  # type: ignore[reportUnknownVariableType]
 
     # Extract navigator props from fingerprint
     nav = fp.navigator if hasattr(fp, "navigator") else fp.get("navigator", {})  # type: ignore[union-attr]
@@ -61,7 +67,7 @@ def generate_persona(
         if hasattr(obj, key):
             return getattr(obj, key)
         if isinstance(obj, dict):
-            return obj.get(key, default)
+            return obj.get(key, default)  # type: ignore[reportUnknownVariableType]
         return default
 
     ua = _get(nav, "userAgent", "")
@@ -76,17 +82,25 @@ def generate_persona(
     # Build clean HTTP header dict (lowercase keys for Playwright)
     http_headers: dict[str, str] = {}
     if hasattr(headers, "items"):
-        http_headers = {k: v for k, v in headers.items() if k.lower() != "user-agent"}
+        # browserforge headers type is not fully typed
+        http_headers = {k: v for k, v in headers.items() if k.lower() != "user-agent"}  # type: ignore[reportUnknownVariableType]
 
     # Serialize the raw fingerprint for caching
     raw: dict[str, Any] = {}
     try:
         if hasattr(fp, "model_dump"):
-            raw = fp.model_dump()  # type: ignore[union-attr]
+            raw_result: Any = fp.model_dump()  # type: ignore[union-attr, reportUnknownVariableType]
+            if isinstance(raw_result, dict):
+                # Cast to dict[str, Any] for type checker
+                raw = dict[str, Any](raw_result)  # type: ignore[arg-type]
         elif hasattr(fp, "dict"):
-            raw = fp.dict()  # type: ignore[union-attr]
+            raw_result: Any = fp.dict()  # type: ignore[union-attr, reportUnknownVariableType]
+            if isinstance(raw_result, dict):
+                # Cast to dict[str, Any] for type checker
+                raw = dict[str, Any](raw_result)  # type: ignore[arg-type]
         elif isinstance(fp, dict):
-            raw = fp
+            # Cast to dict[str, Any] for type checker
+            raw = dict[str, Any](fp)  # type: ignore[arg-type]
     except Exception:
         pass
 
@@ -140,7 +154,7 @@ def _persona_from_dict(d: dict[str, Any]) -> Persona:
 def save_persona(persona: Persona, path: Path) -> None:
     """Write persona to disk as JSON."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(_persona_to_dict(persona), indent=2), encoding="utf-8")
+    _ = path.write_text(json.dumps(_persona_to_dict(persona), indent=2), encoding="utf-8")
 
 
 def load_persona(path: Path) -> Persona | None:

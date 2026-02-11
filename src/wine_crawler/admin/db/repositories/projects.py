@@ -61,8 +61,8 @@ class ProjectsRepository(BaseRepository[Project]):
             [project_id],
         )
         last_job = await self._db.fetch_one(
-            "SELECT finished_at, status FROM jobs WHERE project_id = ? "
-            "ORDER BY created_at DESC LIMIT 1",
+            ("SELECT finished_at, status FROM jobs WHERE project_id = ? "
+             "ORDER BY created_at DESC LIMIT 1"),
             [project_id],
         )
         return {

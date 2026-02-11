@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+# pyright: reportCallInDefaultInitializer=false
+# Typer uses function calls in default values which is intentional
 import contextlib
 import json
 from datetime import datetime, timezone
@@ -14,7 +16,7 @@ from rich.table import Table
 from wine_crawler.config import Settings, ensure_dirs
 from wine_crawler.core import CrawlResult, default_retry, with_browser
 from wine_crawler.core.browser import with_session_browser
-from wine_crawler.core.session import SessionManager, list_sessions
+from wine_crawler.core.session import SessionManager, SessionMeta, list_sessions
 from wine_crawler.logging import setup_logging
 from wine_crawler.sites import get_crawler, list_sites
 
@@ -60,7 +62,7 @@ def session_status(
 
     if site:
         sm = SessionManager(settings, site)
-        sm.migrate_legacy()
+        _ = sm.migrate_legacy()
         meta = sm.load_meta()
         _print_session_detail(sm, meta)
     else:
@@ -131,14 +133,14 @@ def _do_login_command(site: str, *, headful: bool, force: bool) -> None:
         raise typer.Exit(1)
 
     sm = SessionManager(settings, site)
-    sm.migrate_legacy()
+    _ = sm.migrate_legacy()
 
     # If session is usable and not forcing, just validate
     if sm.is_usable and not force:
         meta = sm.load_meta()
         console.print(
-            f"[green]Session for '{site}' is still active[/green]  "
-            f"(TTL remaining: {meta.ttl_remaining_human}, uses: {meta.use_count})"
+            (f"[green]Session for '{site}' is still active[/green]  "
+             f"(TTL remaining: {meta.ttl_remaining_human}, uses: {meta.use_count})")
         )
         console.print("[dim]Use --force to re-login anyway.[/dim]")
         return
@@ -203,7 +205,7 @@ def logout(
         raise typer.Exit(1)
 
     sm = SessionManager(settings, site)
-    sm.migrate_legacy()
+    _ = sm.migrate_legacy()
 
     async def _do_logout() -> None:
         persona = sm.get_or_create_persona()
@@ -249,7 +251,7 @@ def run(
 
     crawler = get_crawler(site)
     sm = SessionManager(settings, site)
-    sm.migrate_legacy()
+    _ = sm.migrate_legacy()
 
     async def _run() -> None:
         async with with_session_browser(settings, site_name=site) as session:
@@ -268,7 +270,7 @@ def run(
             finally:
                 # Persist storage state even if crawl fails
                 with contextlib.suppress(Exception):
-                    await session.context.storage_state(path=str(sm.state_path))
+                    _ = await session.context.storage_state(path=str(sm.state_path))
 
         out_path = out or _default_out_path(settings.data_dir, site)
         out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -277,12 +279,42 @@ def run(
             "items": result.items,
             "generated_at": datetime.now(timezone.utc).isoformat(),
         }
-        out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        _ = out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
         console.print(f"[bold green]OK[/bold green] wrote {out_path}")
 
     import asyncio
 
     asyncio.run(_run())
+
+
+# ======================================================================
+# admin (FastAPI dev server)
+# ======================================================================
+
+
+@app.command("admin")
+def admin(
+    host: str | None = typer.Option(None, "--host", help="Bind host (default: settings.admin_host)"),
+    port: int | None = typer.Option(None, "--port", help="Bind port (default: settings.admin_port)"),
+    reload: bool = typer.Option(True, "--reload/--no-reload", help="Enable auto-reload"),
+) -> None:
+    """Run the Admin Web Tool backend (FastAPI + Uvicorn).
+
+    Requires: `pip install -e ".[admin]"`.
+    """
+    settings = Settings()
+    ensure_dirs(settings)
+
+    import uvicorn
+
+    uvicorn.run(
+        "wine_crawler.admin.app:create_app",
+        factory=True,
+        host=host or settings.admin_host,
+        port=port or settings.admin_port,
+        reload=reload,
+        log_level="info",
+    )
 
 
 # ======================================================================
@@ -295,7 +327,7 @@ def _default_out_path(data_dir: Path, site: str) -> Path:
     return data_dir / site / f"{ts}.json"
 
 
-def _print_session_table(sessions: list) -> None:
+def _print_session_table(sessions: list[SessionMeta]) -> None:
     table = Table(title="Saved Sessions")
     table.add_column("Site", style="bold")
     table.add_column("Status")

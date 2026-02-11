@@ -144,6 +144,7 @@ class SessionManager:
     """High-level façade for per-site session persistence."""
 
     def __init__(self, settings: Settings, site: str, *, ttl_hours: int = 72) -> None:
+        # No parent class, so no super() call needed
         self._settings = settings
         self._site = site
         self._ttl_hours = ttl_hours
@@ -185,7 +186,7 @@ class SessionManager:
 
     def save_meta(self, meta: SessionMeta) -> None:
         self.meta_path.parent.mkdir(parents=True, exist_ok=True)
-        self.meta_path.write_text(
+        _ = self.meta_path.write_text(
             json.dumps(asdict(meta), indent=2, ensure_ascii=False),
             encoding="utf-8",
         )
@@ -270,12 +271,12 @@ class SessionManager:
 
         legacy_state = parent / f"{self._site}.json"
         if legacy_state.exists() and not self.state_path.exists():
-            shutil.move(str(legacy_state), str(self.state_path))
+            _ = shutil.move(str(legacy_state), str(self.state_path))
             moved = True
 
         legacy_persona = parent / f"{self._site}_persona.json"
         if legacy_persona.exists() and not self.persona_path.exists():
-            shutil.move(str(legacy_persona), str(self.persona_path))
+            _ = shutil.move(str(legacy_persona), str(self.persona_path))
             moved = True
 
         # Create initial meta if we migrated files but have none
