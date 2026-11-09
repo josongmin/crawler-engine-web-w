@@ -1,6 +1,32 @@
+<p align="center"><img src="readme-banner.svg" alt="Wine Crawler Workspace — Site-specific browser adapters with a shared core and admin surface." width="100%"></p>
+
 # Wine Crawler Workspace
 
 An extensible Playwright collection workspace with site-specific crawlers, shared browser/session/retry infrastructure, a FastAPI administration API, and a React administration UI.
+
+
+## Engineering highlights
+
+| Mechanism | Engineering purpose |
+| :--- | :--- |
+| **Explicit site registry** | Crawler factories are registered centrally. The current registry includes `example` and `burghound`; unknown names reject. |
+| **Layered Python package** | Configuration/logging, core primitives, sites, and admin layers have import-linter boundaries. |
+| **Shared browser/session handling** | The core owns reusable browser and session behavior rather than duplicating it in each site adapter. |
+| **Separate administration surface** | The admin API and React UI have their own dependency and execution requirements. |
+| **Typed frontend data flow** | The admin interface uses React Query, route-level pages, shared API wrappers, and widget composition. |
+
+
+## Architecture at a glance
+
+```mermaid
+flowchart LR
+    C["winecrawl CLI"] --> R["Site registry"]
+    R --> S["Site crawler adapter"]
+    S --> B["Browser, session, retry core"]
+    B --> O["Data output and session state"]
+    U["React admin UI"] --> A["FastAPI admin services"]
+    A --> R
+```
 
 ## Architecture
 
