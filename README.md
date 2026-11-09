@@ -2,21 +2,23 @@
 
 # Wine Crawler Workspace
 
-An extensible Playwright collection workspace with site-specific crawlers, shared browser/session/retry infrastructure, a FastAPI administration API, and a React administration UI.
+<p align="center"><a href="#engineering-highlights">Engineering</a> · <a href="#architecture">Architecture</a> · <a href="#install-and-run">Get started</a> · <a href="#documentation">Reference</a></p>
 
+An extensible Playwright collection workspace with site-specific crawlers, shared browser/session/retry infrastructure, a FastAPI administration API, and a React administration UI.
 
 ## Engineering highlights
 
-| Mechanism | Engineering purpose |
-| :--- | :--- |
-| **Explicit site registry** | Crawler factories are registered centrally. The current registry includes `example` and `burghound`; unknown names reject. |
-| **Layered Python package** | Configuration/logging, core primitives, sites, and admin layers have import-linter boundaries. |
-| **Shared browser/session handling** | The core owns reusable browser and session behavior rather than duplicating it in each site adapter. |
-| **Separate administration surface** | The admin API and React UI have their own dependency and execution requirements. |
-| **Typed frontend data flow** | The admin interface uses React Query, route-level pages, shared API wrappers, and widget composition. |
+| Mechanism | Engineering purpose | Source |
+| :--- | :--- | :--- |
+| **Explicit site registry** | Crawler factories are registered centrally. The current registry includes `example` and `burghound`; unknown names reject. | [Registry](src/wine_crawler/sites/registry.py) |
+| **Layered Python package** | Configuration/logging, core primitives, sites, and admin layers have import-linter boundaries. | [Import policy](pyproject.toml) |
+| **Shared browser/session handling** | The core owns reusable browser and session behavior rather than duplicating it in each site adapter. | [Browser core](src/wine_crawler/core/browser.py) |
+| **Separate administration surface** | The admin API and React UI have their own dependency and execution requirements. | [Admin app](src/wine_crawler/admin/app.py) |
+| **Typed frontend data flow** | The admin interface uses React Query, route-level pages, shared API wrappers, and widget composition. | [Frontend](admin-ui/src/shared/) |
 
+## Architecture
 
-## Architecture at a glance
+<a id="architecture-at-a-glance"></a>
 
 ```mermaid
 flowchart LR
@@ -27,8 +29,6 @@ flowchart LR
     U["React admin UI"] --> A["FastAPI admin services"]
     A --> R
 ```
-
-## Architecture
 
 | Path | Responsibility |
 | --- | --- |
@@ -84,3 +84,5 @@ AWS execution uses the API/SQS/ECS-worker path and requires an actual account, q
 - [Contributor guide](AGENTS.md)
 - [Command recipes](justfile)
 - [Package and layer configuration](pyproject.toml)
+
+<p align="center"><sub><a href="https://github.com/josongmin">Project map</a> · <a href="#engineering-highlights">Back to overview</a></sub></p>
